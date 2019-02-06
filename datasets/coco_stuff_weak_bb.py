@@ -74,25 +74,31 @@ def _preview_image(coco, img_id, data_root):
     ann_ids = coco.getAnnIds(imgIds=img_id)
     anns = coco.loadAnns(ann_ids)
     img = Image.open(img_path)
-    cat_ids = [ann["category_id"] for ann in anns]
-    print(coco.loadCats(ids=cat_ids))
     img.show()
     input("Press Enter to continue...")
 
 
-def _filter_dataset(ann_file_path, data_root, target_class,
+def _preview_mask(seg):
+    seg_arr = np.asarray(seg)
+    seg_arr = np.multiply(seg_arr, 100)
+    mask = Image.fromarray(seg_arr)
+    mask.show()
+    input("Press Enter to continue...")
+
+
+def _filter_dataset(ann_file_path, data_root, target_supercategories,
                     filtered_data_location):
     """ Filters out image/segmentation pairs that contain the target class. """
     coco = COCO(ann_file_path)
     img_ids = coco.getImgIds()
+    target_cat_ids = coco.getCatIds(supNms=target_supercategories)
 
     # Filter image/annotation pairs
     for img_id in tqdm(img_ids):
-        _preview_image(coco, img_id, data_root)
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         for ann in anns:
-            if ann["category_id"] == target_class:
+            if ann["category_id"] in target_cat_ids:
                 img_name = coco.loadImgs(img_id)[0]['file_name']
                 img_path = Path(data_root, img_name)
                 img_path_ = Path(filtered_data_location, "images", img_name)
@@ -111,12 +117,14 @@ def _filter_dataset(ann_file_path, data_root, target_class,
                     os.makedirs(Path(filtered_data_location, "annotations/"))
                 seg.save(seg_path)
 
+                _preview_image(coco, img_id, data_root)
+
     # Filter bounding boxes
     for img_id in range(len(img_ids)):
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         for ann in anns:
-            if ann["category_id"] == target_class:
+            if ann["category_id"] in target_cat_ids:
                 for i in range(10):
                     mask = _draw_bbox_mask(coco, img_id, ann["bbox"])
                     seg = Image.fromarray(mask).convert("L")
@@ -127,6 +135,7 @@ def _filter_dataset(ann_file_path, data_root, target_class,
                             Path(filtered_data_location, "bbox")):
                         os.makedirs(Path(filtered_data_location, "bbox"))
                     seg.save(seg_path)
+                    _preview_mask(seg)
 
     # Filter the annotations.csv file
     filtered_ann_path = Path(filtered_data_location, "annotations.csv")
@@ -140,24 +149,14 @@ def _filter_dataset(ann_file_path, data_root, target_class,
             ann_ids = coco.getAnnIds(imgIds=img_id)
             anns = coco.loadAnns(ann_ids)
             for ann in anns:
-                if ann["category_id"] == target_class:
+                if ann["category_id"] in target_cat_ids:
                     for i in range(10):
                         img_name = coco.loadImgs(img_id)[0]['file_name']
                         writer.writerow([img_name, i])
 
 
-def build_coco_stuff_weak_bb(target_class=95, should_download=False):
-    """ target_class_to_name = {
-            95
-            97 
-            106
-            111
-            135
-            142
-            157
-            169
-            183
-        } """
+def build_coco_stuff_weak_bb(target_supercategories=["sky"],
+                             should_download=False):
     if should_download:
         raise NotImplementedError("Download functionality not implemented. ")
 
@@ -167,5 +166,5 @@ def build_coco_stuff_weak_bb(target_class=95, should_download=False):
         if not os.path.exists(FILTERED_SPLIT_FOLDER):
             os.mkdir(FILTERED_SPLIT_FOLDER)
 
-        _filter_dataset(split[1], split[2], target_class,
+        _filter_dataset(split[1], split[2], target_supercategories,
                         FILTERED_SPLIT_FOLDER)
