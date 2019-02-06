@@ -6,6 +6,7 @@ import numpy as np
 import os
 import random
 import shutil
+from tqdm import tqdm
 
 if os.name == "nt":
     TRAIN_ANN_FILE = Path(
@@ -16,7 +17,8 @@ if os.name == "nt":
         "D:/code/data/cocostuff/dataset/annotations/stuff_val2017.json")
     VAL_DATA_ROOT = Path("D:/code/data/cocostuff/dataset/images/val2017")
 
-    FILTERED_DATA_ROOT = Path("D:/code/data/filtered_datasets/")
+    FILTERED_DATA_ROOT = Path(
+        "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb")
     if not os.path.exists(FILTERED_DATA_ROOT):
         os.makedirs(FILTERED_DATA_ROOT)
 
@@ -73,26 +75,27 @@ def _filter_dataset(ann_file_path, data_root, target_class,
     img_ids = coco.getImgIds()
 
     # Filter image/annotation pairs
-    for img_id in range(len(img_ids)):
+    for img_id in tqdm(range(len(img_ids))):
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         for ann in anns:
             if ann["category_id"] == target_class:
                 img_name = coco.loadImgs(img_id)[0]['file_name']
-                img_path = data_root + img_name
-                img_path_ = filtered_data_location + "images/" + img_name
-                if not os.path.exists(filtered_data_location + "images/"):
-                    os.makedirs(filtered_data_location + "images/")
+                img_path = Path(data_root, img_name)
+                img_path_ = Path(filtered_data_location, "images", img_name)
+                if not os.path.exists(Path(filtered_data_location, "images")):
+                    os.makedirs(Path(filtered_data_location, "images"))
                 shutil.copyfile(img_path, img_path_)
 
                 mask = coco.annToMask(ann)
                 seg = Image.fromarray(mask)
                 seg_name = coco.loadImgs(img_id)[0]['file_name'].replace(
-                    ".jpg", "")
-                seg_path = (filtered_data_location + "annotations/" + seg_name
-                            + ".png")
-                if not os.path.exists(filtered_data_location + "annotations/"):
-                    os.makedirs(filtered_data_location + "annotations/")
+                    ".jpg", ".png")
+                seg_path = Path(filtered_data_location, "annotations",
+                                seg_name)
+                if not os.path.exists(
+                        Path(filtered_data_location, "annotations")):
+                    os.makedirs(Path(filtered_data_location, "annotations/"))
                 seg.save(seg_path)
 
     # Filter bounding boxes
@@ -105,15 +108,15 @@ def _filter_dataset(ann_file_path, data_root, target_class,
                     mask = _draw_bbox_mask(coco, img_id, ann["bbox"])
                     seg = Image.fromarray(mask).convert("L")
                     seg_name = coco.loadImgs(img_id)[0]['file_name'].replace(
-                        ".jpg", "")
-                    seg_path = (filtered_data_location + "bbox/" + seg_name +
-                                "-" + str(i) + ".png")
-                    if not os.path.exists(filtered_data_location + "bbox/"):
-                        os.makedirs(filtered_data_location + "bbox/")
+                        ".jpg", "-" + str(i) + ".png")
+                    seg_path = Path(filtered_data_location, "bbox", seg_name)
+                    if not os.path.exists(
+                            Path(filtered_data_location, "bbox")):
+                        os.makedirs(Path(filtered_data_location, "bbox"))
                     seg.save(seg_path)
 
     # Filter the annotations.csv file
-    filtered_ann_path = filtered_data_location + "annotations.csv"
+    filtered_ann_path = Path(filtered_data_location, "annotations.csv")
     with open(filtered_ann_path, mode='w', newline='') as filtered_ann_file:
         writer = csv.writer(
             filtered_ann_file,
