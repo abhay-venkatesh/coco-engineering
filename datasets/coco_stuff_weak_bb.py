@@ -162,7 +162,6 @@ def _filter_dataset(ann_file_path, data_root, target_supercategories,
                         Path(filtered_data_location, "annotations")):
                     os.makedirs(Path(filtered_data_location, "annotations/"))
                 seg.save(seg_path)
-                _preview_image(coco, img_id, data_root)
 
                 # Filter bounding boxes
                 for i in range(10):
@@ -175,7 +174,6 @@ def _filter_dataset(ann_file_path, data_root, target_supercategories,
                             Path(filtered_data_location, "bbox")):
                         os.makedirs(Path(filtered_data_location, "bbox"))
                     bbox.save(bbox_path)
-                    _preview_mask(bbox)
 
     # Filter the annotations.csv file
     filtered_ann_path = Path(filtered_data_location, "annotations.csv")
