@@ -23,13 +23,16 @@ if os.name == "nt":
         os.makedirs(FILTERED_DATA_ROOT)
 
 else:
-    TRAIN_ANN_FILE = Path("")
-    TRAIN_DATA_ROOT = Path("")
+    TRAIN_ANN_FILE = Path(
+        "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_train2017.json")
+    TRAIN_DATA_ROOT = Path("/mnt/hdd-4tb/abhay/cocostuff/dataset/images/train2017")
 
-    VAL_ANN_FILE = Path("")
-    VAL_DATA_ROOT = Path("")
+    VAL_ANN_FILE = Path(
+        "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_val2017.json")
+    VAL_DATA_ROOT = Path("/mnt/hdd-4tb/abhay/cocostuff/dataset/images/val2017")
 
-    FILTERED_DATA_ROOT = Path("")
+    FILTERED_DATA_ROOT = Path(
+        "/mnt/hdd-4tb/abhay/datasets/coco_stuff_sky_weak_bb")
     if not os.path.exists(FILTERED_DATA_ROOT):
         os.makedirs(FILTERED_DATA_ROOT)
 
