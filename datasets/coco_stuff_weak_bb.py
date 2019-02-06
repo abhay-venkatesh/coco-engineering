@@ -8,27 +8,28 @@ import random
 import shutil
 
 if os.name == "nt":
-    TRAIN_ANN_FILE = Path("")
-    TRAIN_DATA_ROOT = Path("")
-    FILTERED_TRAIN_DATA_ROOT = Path("")
-    if not os.path.exists(FILTERED_TRAIN_DATA_ROOT):
-        os.makedirs(FILTERED_TRAIN_DATA_ROOT)
-    VAL_ANN_FILE = Path("")
-    VAL_DATA_ROOT = Path("")
-    FILTERED_VAL_DATA_ROOT = Path("")
-    if not os.path.exists(FILTERED_VAL_DATA_ROOT):
-        os.makedirs(FILTERED_VAL_DATA_ROOT)
+    TRAIN_ANN_FILE = Path(
+        "D:/code/data/cocostuff/dataset/annotations/stuff_train2017.json")
+    TRAIN_DATA_ROOT = Path("D:/code/data/cocostuff/dataset/images/train2017")
+
+    VAL_ANN_FILE = Path(
+        "D:/code/data/cocostuff/dataset/annotations/stuff_val2017.json")
+    VAL_DATA_ROOT = Path("D:/code/data/cocostuff/dataset/images/val2017")
+
+    FILTERED_DATA_ROOT = Path("D:/code/data/filtered_datasets/")
+    if not os.path.exists(FILTERED_DATA_ROOT):
+        os.makedirs(FILTERED_DATA_ROOT)
+
 else:
     TRAIN_ANN_FILE = Path("")
     TRAIN_DATA_ROOT = Path("")
-    FILTERED_TRAIN_DATA_ROOT = Path("")
-    if not os.path.exists(FILTERED_TRAIN_DATA_ROOT):
-        os.makedirs(FILTERED_TRAIN_DATA_ROOT)
+
     VAL_ANN_FILE = Path("")
     VAL_DATA_ROOT = Path("")
-    FILTERED_VAL_DATA_ROOT = Path("")
-    if not os.path.exists(FILTERED_VAL_DATA_ROOT):
-        os.makedirs(FILTERED_VAL_DATA_ROOT)
+
+    FILTERED_DATA_ROOT = Path("")
+    if not os.path.exists(FILTERED_DATA_ROOT):
+        os.makedirs(FILTERED_DATA_ROOT)
 
 
 def _random_bbox(bbox):
@@ -39,7 +40,8 @@ def _random_bbox(bbox):
 
 
 def _draw_bbox_mask(coco, img_id, bbox):
-    """ We want to get 10 bounding boxes per image. In order to do that, we need to
+    """ We want to get 10 bounding boxes per image. In order to do that,
+        we need to:
         1. Convert (x, y, width, height) into 4 coordinates
         2. Generate random 4 coordinates bounded by those 4 coordinates """
     img_height = coco.loadImgs(img_id)[0]['height']
@@ -55,7 +57,6 @@ def _draw_bbox_mask(coco, img_id, bbox):
 
 def _get_rect(x, y, width, height, angle):
     """ Get a rectangle from (x, y) and (width, height) """
-    # Reference: https://stackoverflow.com/questions/12638790/drawing-a-rectangle-inside-a-2d-numpy-array
     rect = np.array([(0, 0), (width, 0), (width, height), (0, height), (0, 0)])
     theta = (np.pi / 180.0) * angle
     R = np.array([[np.cos(theta), -np.sin(theta)],
@@ -130,10 +131,17 @@ def _filter_dataset(ann_file_path, data_root, target_class,
 
 
 def build_coco_stuff_weak_bb(target_class=157, should_download=False):
+    """ target_class_to_name = {
+            157: "sky",
+        } """
     if should_download:
-        # TODO:
         raise NotImplementedError("Download functionality not implemented. ")
-    _filter_dataset(TRAIN_ANN_FILE, TRAIN_DATA_ROOT, target_class,
-                    FILTERED_TRAIN_DATA_ROOT)
-    _filter_dataset(VAL_ANN_FILE, VAL_DATA_ROOT, target_class,
-                    FILTERED_VAL_DATA_ROOT)
+
+    for split in zip(["train", "val"], [TRAIN_ANN_FILE, VAL_ANN_FILE],
+                     [TRAIN_DATA_ROOT, VAL_DATA_ROOT]):
+        FILTERED_SPLIT_FOLDER = Path(FILTERED_DATA_ROOT, "train")
+        if not os.path.exists(FILTERED_SPLIT_FOLDER):
+            os.mkdir(FILTERED_SPLIT_FOLDER)
+
+        _filter_dataset(split[1], split[2], target_class,
+                        FILTERED_SPLIT_FOLDER)
