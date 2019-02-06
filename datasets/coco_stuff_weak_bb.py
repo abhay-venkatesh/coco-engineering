@@ -68,6 +68,18 @@ def _get_rect(x, y, width, height, angle):
     return transformed_rect
 
 
+def _preview_image(coco, img_id, data_root):
+    img_name = coco.loadImgs(img_id)[0]['file_name']
+    img_path = Path(data_root, img_name)
+    ann_ids = coco.getAnnIds(imgIds=img_id)
+    anns = coco.loadAnns(ann_ids)
+    img = Image.open(img_path)
+    cat_ids = [ann["category_id"] for ann in anns]
+    print(coco.loadCats(ids=cat_ids))
+    img.show()
+    input("Press Enter to continue...")
+
+
 def _filter_dataset(ann_file_path, data_root, target_class,
                     filtered_data_location):
     """ Filters out image/segmentation pairs that contain the target class. """
@@ -75,7 +87,8 @@ def _filter_dataset(ann_file_path, data_root, target_class,
     img_ids = coco.getImgIds()
 
     # Filter image/annotation pairs
-    for img_id in tqdm(range(len(img_ids))):
+    for img_id in tqdm(img_ids):
+        _preview_image(coco, img_id, data_root)
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         for ann in anns:
@@ -133,9 +146,17 @@ def _filter_dataset(ann_file_path, data_root, target_class,
                         writer.writerow([img_name, i])
 
 
-def build_coco_stuff_weak_bb(target_class=157, should_download=False):
+def build_coco_stuff_weak_bb(target_class=95, should_download=False):
     """ target_class_to_name = {
-            157: "sky",
+            95
+            97 
+            106
+            111
+            135
+            142
+            157
+            169
+            183
         } """
     if should_download:
         raise NotImplementedError("Download functionality not implemented. ")
