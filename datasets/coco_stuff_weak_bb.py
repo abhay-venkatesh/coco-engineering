@@ -38,7 +38,6 @@ def _random_bbox(bbox):
     x, y, w, h = bbox
     x_, y_ = random.randint(x, x + w), random.randint(y, y + h)
     w_, h_ = abs(x_ - w), abs(y_ - h)
-    print((x_, y_, w_, h_))
     return x_, y_, w_, h_
 
 
@@ -179,7 +178,7 @@ def _filter_dataset(ann_file_path, data_root, target_supercategories,
             delimiter=',',
             quotechar='"',
             quoting=csv.QUOTE_MINIMAL)
-        for img_id in range(len(img_ids)):
+        for img_id in img_ids:
             ann_ids = coco.getAnnIds(imgIds=img_id)
             anns = coco.loadAnns(ann_ids)
             for ann in anns:
