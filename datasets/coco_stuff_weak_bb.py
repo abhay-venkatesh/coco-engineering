@@ -37,8 +37,52 @@ else:
 def _random_bbox(bbox):
     x, y, w, h = bbox
     x_, y_ = random.randint(x, x + w), random.randint(y, y + h)
-    w_, h_ = random.randint(x_, x + w), random.randint(y_, y + h)
+    w_, h_ = abs(x_ - w), abs(y_ - h)
+    print((x_, y_, w_, h_))
     return x_, y_, w_, h_
+
+
+def _draw_random_bbox_mask(coco, img_id, bbox):
+    """ We want to get 10 bounding boxes per image. In order to do that,
+        we need to:
+        1. Convert (x, y, width, height) into 4 coordinates
+        2. Generate random 4 coordinates bounded by those 4 coordinates """
+    img_height = coco.loadImgs(img_id)[0]['height']
+    img_width = coco.loadImgs(img_id)[0]['width']
+    seg = Image.fromarray(np.zeros((img_height, img_width)))
+    draw = ImageDraw.Draw(seg)
+    x, y, mask_width, mask_height = _random_bbox(bbox)
+    rect = _get_rect(x, y, mask_width, mask_height, 0)
+    draw.polygon([tuple(p) for p in rect], fill=1)
+    np_seg = np.asarray(seg)
+    return np_seg
+
+
+def _get_seg_boundary(seg):
+    rows, cols = np.nonzero(seg)
+    x = min(cols)
+    w = max(cols)
+    y = min(rows)
+    h = max(rows)
+    return x, y, w, h
+
+
+def _draw_random_bbox_from_seg(coco, img_id, seg_array):
+    """ We want to get 10 bounding boxes per image. In order to do that,
+        we need to:
+        1. Convert (x, y, width, height) into 4 coordinates
+        2. Generate random 4 coordinates bounded by those 4 coordinates """
+    img_height = coco.loadImgs(img_id)[0]['height']
+    img_width = coco.loadImgs(img_id)[0]['width']
+    seg = Image.fromarray(np.zeros((img_height, img_width)))
+    draw = ImageDraw.Draw(seg)
+    seg_boundary = _get_seg_boundary(seg_array)
+    x, y, mask_width, mask_height = _random_bbox(seg_boundary)
+    # x, y, mask_width, mask_height = seg_boundary
+    rect = _get_rect(x, y, mask_width, mask_height, 0)
+    draw.polygon([tuple(p) for p in rect], fill=1)
+    np_seg = np.asarray(seg)
+    return np_seg
 
 
 def _draw_bbox_mask(coco, img_id, bbox):
@@ -50,7 +94,7 @@ def _draw_bbox_mask(coco, img_id, bbox):
     img_width = coco.loadImgs(img_id)[0]['width']
     seg = Image.fromarray(np.zeros((img_height, img_width)))
     draw = ImageDraw.Draw(seg)
-    x, y, mask_width, mask_height = _random_bbox(bbox)
+    x, y, mask_width, mask_height = bbox
     rect = _get_rect(x, y, mask_width, mask_height, 0)
     draw.polygon([tuple(p) for p in rect], fill=1)
     np_seg = np.asarray(seg)
@@ -71,8 +115,6 @@ def _get_rect(x, y, width, height, angle):
 def _preview_image(coco, img_id, data_root):
     img_name = coco.loadImgs(img_id)[0]['file_name']
     img_path = Path(data_root, img_name)
-    ann_ids = coco.getAnnIds(imgIds=img_id)
-    anns = coco.loadAnns(ann_ids)
     img = Image.open(img_path)
     img.show()
     input("Press Enter to continue...")
@@ -93,12 +135,12 @@ def _filter_dataset(ann_file_path, data_root, target_supercategories,
     img_ids = coco.getImgIds()
     target_cat_ids = coco.getCatIds(supNms=target_supercategories)
 
-    # Filter image/annotation pairs
     for img_id in tqdm(img_ids):
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         for ann in anns:
             if ann["category_id"] in target_cat_ids:
+                # Filter image/annotation pairs
                 img_name = coco.loadImgs(img_id)[0]['file_name']
                 img_path = Path(data_root, img_name)
                 img_path_ = Path(filtered_data_location, "images", img_name)
@@ -106,8 +148,8 @@ def _filter_dataset(ann_file_path, data_root, target_supercategories,
                     os.makedirs(Path(filtered_data_location, "images"))
                 shutil.copyfile(img_path, img_path_)
 
-                mask = coco.annToMask(ann)
-                seg = Image.fromarray(mask)
+                seg_array = coco.annToMask(ann)
+                seg = Image.fromarray(seg_array)
                 seg_name = coco.loadImgs(img_id)[0]['file_name'].replace(
                     ".jpg", ".png")
                 seg_path = Path(filtered_data_location, "annotations",
@@ -118,24 +160,20 @@ def _filter_dataset(ann_file_path, data_root, target_supercategories,
                 seg.save(seg_path)
 
                 _preview_image(coco, img_id, data_root)
+                _preview_mask(seg)
 
-    # Filter bounding boxes
-    for img_id in range(len(img_ids)):
-        ann_ids = coco.getAnnIds(imgIds=img_id)
-        anns = coco.loadAnns(ann_ids)
-        for ann in anns:
-            if ann["category_id"] in target_cat_ids:
+                # Filter bounding boxes
                 for i in range(10):
-                    mask = _draw_bbox_mask(coco, img_id, ann["bbox"])
-                    seg = Image.fromarray(mask).convert("L")
-                    seg_name = coco.loadImgs(img_id)[0]['file_name'].replace(
+                    bbox = _draw_random_bbox_from_seg(coco, img_id, seg_array)
+                    bbox = Image.fromarray(bbox).convert("L")
+                    bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(
                         ".jpg", "-" + str(i) + ".png")
-                    seg_path = Path(filtered_data_location, "bbox", seg_name)
+                    bbox_path = Path(filtered_data_location, "bbox", bbox_name)
                     if not os.path.exists(
                             Path(filtered_data_location, "bbox")):
                         os.makedirs(Path(filtered_data_location, "bbox"))
-                    seg.save(seg_path)
-                    _preview_mask(seg)
+                    bbox.save(bbox_path)
+                    _preview_mask(bbox)
 
     # Filter the annotations.csv file
     filtered_ann_path = Path(filtered_data_location, "annotations.csv")
