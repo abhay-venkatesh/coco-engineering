@@ -27,7 +27,7 @@ if os.name == "nt":
             "name": "train",
             "ann_file": TRAIN_ANN_FILE,
             "data_root": TRAIN_DATA_ROOT,
-            "fraction": 0.05
+            "fraction": 0.1
         },
         {
             "name": "val",
