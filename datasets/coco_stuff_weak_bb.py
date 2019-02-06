@@ -1,12 +1,12 @@
 from PIL import Image, ImageDraw
 from pathlib import Path
 from pycocotools.coco import COCO
+from tqdm import tqdm
 import csv
 import numpy as np
 import os
 import random
 import shutil
-from tqdm import tqdm
 
 if os.name == "nt":
     TRAIN_ANN_FILE = Path(
@@ -21,6 +21,21 @@ if os.name == "nt":
         "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb")
     if not os.path.exists(FILTERED_DATA_ROOT):
         os.makedirs(FILTERED_DATA_ROOT)
+
+    SPLITS = [
+        {
+            "name": "train",
+            "ann_file": TRAIN_ANN_FILE,
+            "data_root": TRAIN_DATA_ROOT,
+            "fraction": 0.05
+        },
+        {
+            "name": "val",
+            "ann_file": VAL_ANN_FILE,
+            "data_root": VAL_DATA_ROOT,
+            "fraction": 1.0
+        },
+    ]
 
 else:
     TRAIN_ANN_FILE = Path(
@@ -42,7 +57,8 @@ else:
 def _random_bbox(bbox):
     x, y, w, h = bbox
     x_, y_ = random.randint(x, x + w), random.randint(y, y + h)
-    w_, h_ = abs(x_ - random.randint(x_, x + w)), abs(y_ - random.randint(y_, y + h))
+    w_, h_ = abs(x_ - random.randint(x_, x + w)), abs(
+        y_ - random.randint(y_, y + h))
     return x_, y_, w_, h_
 
 
@@ -132,14 +148,17 @@ def _preview_mask(seg):
     input("Press Enter to continue...")
 
 
-def _filter_dataset(ann_file_path, data_root, target_supercategories,
-                    filtered_data_location):
+def _filter_dataset(ann_file_path,
+                    data_root,
+                    target_supercategories,
+                    filtered_data_location,
+                    fraction=1.0):
     """ Filters out image/segmentation pairs that contain the target class. """
     coco = COCO(ann_file_path)
     img_ids = coco.getImgIds()
     target_cat_ids = coco.getCatIds(supNms=target_supercategories)
 
-    for img_id in tqdm(img_ids):
+    for img_id in tqdm(img_ids[:int(fraction * len(img_ids))]):
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         for ann in anns:
@@ -198,11 +217,11 @@ def build_coco_stuff_weak_bb(target_supercategories=["sky"],
     if should_download:
         raise NotImplementedError("Download functionality not implemented. ")
 
-    for split in zip(["train", "val"], [TRAIN_ANN_FILE, VAL_ANN_FILE],
-                     [TRAIN_DATA_ROOT, VAL_DATA_ROOT]):
-        FILTERED_SPLIT_FOLDER = Path(FILTERED_DATA_ROOT, "train")
-        if not os.path.exists(FILTERED_SPLIT_FOLDER):
-            os.mkdir(FILTERED_SPLIT_FOLDER)
+    for split in SPLITS:
+        filtered_split_folder = Path(split["data_root"], "train")
+        if not os.path.exists(filtered_split_folder):
+            os.mkdir(filtered_split_folder)
 
-        _filter_dataset(split[1], split[2], target_supercategories,
-                        FILTERED_SPLIT_FOLDER)
+        _filter_dataset(split["ann_file"], split["data_root"],
+                        target_supercategories, filtered_split_folder,
+                        split["fraction"])
