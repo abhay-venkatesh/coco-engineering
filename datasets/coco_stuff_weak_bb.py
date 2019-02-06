@@ -24,8 +24,10 @@ if os.name == "nt":
 
 else:
     TRAIN_ANN_FILE = Path(
-        "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_train2017.json")
-    TRAIN_DATA_ROOT = Path("/mnt/hdd-4tb/abhay/cocostuff/dataset/images/train2017")
+        "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_train2017.json"
+    )
+    TRAIN_DATA_ROOT = Path(
+        "/mnt/hdd-4tb/abhay/cocostuff/dataset/images/train2017")
 
     VAL_ANN_FILE = Path(
         "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_val2017.json")
