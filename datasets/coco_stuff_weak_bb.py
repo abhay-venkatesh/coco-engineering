@@ -73,7 +73,7 @@ def _random_bbox(seg_array, smoothing=2):
     xb, yb, wb, hb = 0, 0, 5, 2 """
     _, _, wb, hb = _get_seg_boundary(seg_array)
     rows, cols = np.nonzero(seg_array)
-    ri = random.randint(0, len(rows))
+    ri = random.randint(0, len(rows)-1)
     """ Then,
     y in [0, 1]
     x in [0, 1, 2, 3, 4] """
