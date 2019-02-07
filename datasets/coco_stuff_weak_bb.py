@@ -21,7 +21,6 @@ if os.name == "nt":
         "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb")
     if not os.path.exists(FILTERED_DATA_ROOT):
         os.makedirs(FILTERED_DATA_ROOT)
-
     SPLITS = [
         {
             "name": "train",
@@ -33,7 +32,7 @@ if os.name == "nt":
             "name": "val",
             "ann_file": VAL_ANN_FILE,
             "data_root": VAL_DATA_ROOT,
-            "fraction": 1.0
+            "fraction": 0.01
         },
     ]
 
@@ -218,7 +217,7 @@ def build_coco_stuff_weak_bb(target_supercategories=["sky"],
         raise NotImplementedError("Download functionality not implemented. ")
 
     for split in SPLITS:
-        filtered_split_folder = Path(split["data_root"], "train")
+        filtered_split_folder = Path(FILTERED_DATA_ROOT, split["name"])
         if not os.path.exists(filtered_split_folder):
             os.mkdir(filtered_split_folder)
 
