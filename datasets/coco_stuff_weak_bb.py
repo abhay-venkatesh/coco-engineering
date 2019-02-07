@@ -64,28 +64,20 @@ else:
     ]
 
 
-def _random_bbox(bbox):
-    x, y, w, h = bbox
+def _random_bbox(seg_array):
+    # TODO: Fix math here
+    x, y, w, h = _get_seg_boundary(seg_array)
     x_, y_ = random.randint(x, x + w), random.randint(y, y + h)
     w_, h_ = abs(x_ - random.randint(x_, x + w)), abs(
         y_ - random.randint(y_, y + h))
+    cx, cy = (x_ + w_) // 2, (y_ + h_) // 2
+    print(seg_array)
+    while seg_array[cx][cy] != 1:
+        x_, y_ = random.randint(x, x + w), random.randint(y, y + h)
+        w_, h_ = abs(x_ - random.randint(x_, x + w)), abs(
+            y_ - random.randint(y_, y + h))
+        cx, cy = (x_ + w_) // 2, (y_ + h_) // 2
     return x_, y_, w_, h_
-
-
-def _draw_random_bbox_mask(coco, img_id, bbox):
-    """ We want to get 10 bounding boxes per image. In order to do that,
-        we need to:
-        1. Convert (x, y, width, height) into 4 coordinates
-        2. Generate random 4 coordinates bounded by those 4 coordinates """
-    img_height = coco.loadImgs(img_id)[0]['height']
-    img_width = coco.loadImgs(img_id)[0]['width']
-    seg = Image.fromarray(np.zeros((img_height, img_width)))
-    draw = ImageDraw.Draw(seg)
-    x, y, mask_width, mask_height = _random_bbox(bbox)
-    rect = _get_rect(x, y, mask_width, mask_height, 0)
-    draw.polygon([tuple(p) for p in rect], fill=1)
-    np_seg = np.asarray(seg)
-    return np_seg
 
 
 def _get_seg_boundary(seg):
@@ -106,9 +98,21 @@ def _draw_random_bbox_from_seg(coco, img_id, seg_array):
     img_width = coco.loadImgs(img_id)[0]['width']
     seg = Image.fromarray(np.zeros((img_height, img_width)))
     draw = ImageDraw.Draw(seg)
-    seg_boundary = _get_seg_boundary(seg_array)
-    x, y, mask_width, mask_height = _random_bbox(seg_boundary)
-    rect = _get_rect(x, y, mask_width, mask_height, 0)
+    x, y, w, h = _random_bbox(seg_array)
+    """
+    img = [
+        [1, 1, 1],
+        [0, 0, 0],
+        [1, 1, 1],
+    ]
+
+    then (x,y) coordinates of each element are given by [
+        [(0, 0), (0, 1), (0, 2)],
+        [(1, 0), (1, 1), (1, 2)],
+        [(2, 0), (2, 1), (2, 2)],
+    ]
+    """
+    rect = _get_rect(x, y, w, h, 0)
     draw.polygon([tuple(p) for p in rect], fill=1)
     np_seg = np.asarray(seg, dtype=int)
     return np_seg
