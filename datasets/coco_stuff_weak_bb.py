@@ -45,9 +45,6 @@ else:
         "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_val2017.json")
     VAL_DATA_ROOT = Path("/mnt/hdd-4tb/abhay/cocostuff/dataset/images/val2017")
 
-    FILTERED_DATA_ROOT = Path(
-        "/mnt/hdd-4tb/abhay/datasets/coco_stuff_sky_weak_bb")
-
     SPLITS = [
         {
             "name": "train",
@@ -65,12 +62,27 @@ else:
 
 
 def _random_bbox(seg_array, smoothing=2):
+    """ For example, let
+    seg_array = [
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+    ]
+    xb, yb, wb, hb = 0, 0, 5, 2 """
     _, _, wb, hb = _get_seg_boundary(seg_array)
     rows, cols = np.nonzero(seg_array)
     ri = random.randint(0, len(rows))
+    """ Then,
+    y in [0, 1]
+    x in [0, 1, 2, 3, 4] """
     y, x = rows[ri], cols[ri]
-    h, w = abs(y - random.randint(y, (y + hb) // smoothing)), abs(
-        x - random.randint(x, (x + wb) // smoothing))
+    """ We want
+    h in [0, hb - y]
+    w in [0, wb - x] """
+    h, w = random.randint(0, (hb - y) // smoothing), random.randint(
+        0, (wb - x) // smoothing)
     return x, y, w, h
 
 
@@ -174,6 +186,7 @@ def _filter_agg_bounding_boxes(coco,
     bbox = Image.fromarray(bbox).convert("L")
     bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(".jpg", "-0.png")
     bbox_path = Path(filtered_data_location, "bbox", bbox_name)
+    # _preview_mask(bbox)
     bbox.save(bbox_path)
 
 
@@ -225,6 +238,7 @@ def _filter_dataset(ann_file_path,
                 if not os.path.exists(Path(filtered_data_location, "images")):
                     os.makedirs(Path(filtered_data_location, "images"))
                 shutil.copyfile(img_path, img_path_)
+                # _preview_image(coco, img_id, data_root)
 
                 seg_array = coco.annToMask(ann)
                 seg = Image.fromarray(seg_array)
@@ -236,6 +250,7 @@ def _filter_dataset(ann_file_path,
                         Path(filtered_data_location, "annotations")):
                     os.makedirs(Path(filtered_data_location, "annotations/"))
                 seg.save(seg_path)
+                # _preview_mask(seg)
 
                 if bbox_type == "aggregated":
                     _filter_agg_bounding_boxes(coco, img_id, seg_array,
