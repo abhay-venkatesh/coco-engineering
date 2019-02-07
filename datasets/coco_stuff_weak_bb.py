@@ -64,24 +64,18 @@ else:
     ]
 
 
-def _random_bbox(seg_array):
-    # TODO: Fix math here
-    x, y, w, h = _get_seg_boundary(seg_array)
-    x_, y_ = random.randint(x, x + w), random.randint(y, y + h)
-    w_, h_ = abs(x_ - random.randint(x_, x + w)), abs(
-        y_ - random.randint(y_, y + h))
-    cx, cy = (x_ + w_) // 2, (y_ + h_) // 2
-    print(seg_array)
-    while seg_array[cx][cy] != 1:
-        x_, y_ = random.randint(x, x + w), random.randint(y, y + h)
-        w_, h_ = abs(x_ - random.randint(x_, x + w)), abs(
-            y_ - random.randint(y_, y + h))
-        cx, cy = (x_ + w_) // 2, (y_ + h_) // 2
-    return x_, y_, w_, h_
+def _random_bbox(seg_array, smoothing=2):
+    _, _, wb, hb = _get_seg_boundary(seg_array)
+    rows, cols = np.nonzero(seg_array)
+    ri = random.randint(0, len(rows))
+    y, x = rows[ri], cols[ri]
+    h, w = abs(y - random.randint(y, (y + hb) // smoothing)), abs(
+        x - random.randint(x, (x + wb) // smoothing))
+    return x, y, w, h
 
 
-def _get_seg_boundary(seg):
-    rows, cols = np.nonzero(seg)
+def _get_seg_boundary(seg_array):
+    rows, cols = np.nonzero(seg_array)
     x = min(cols)
     w = max(cols)
     y = min(rows)
@@ -90,10 +84,6 @@ def _get_seg_boundary(seg):
 
 
 def _draw_random_bbox_from_seg(coco, img_id, seg_array):
-    """ We want to get 10 bounding boxes per image. In order to do that,
-        we need to:
-        1. Convert (x, y, width, height) into 4 coordinates
-        2. Generate random 4 coordinates bounded by those 4 coordinates """
     img_height = coco.loadImgs(img_id)[0]['height']
     img_width = coco.loadImgs(img_id)[0]['width']
     seg = Image.fromarray(np.zeros((img_height, img_width)))
@@ -106,7 +96,7 @@ def _draw_random_bbox_from_seg(coco, img_id, seg_array):
         [1, 1, 1],
     ]
 
-    then (x,y) coordinates of each element are given by [
+    then (x, y) indexes of each element are given by [
         [(0, 0), (0, 1), (0, 2)],
         [(1, 0), (1, 1), (1, 2)],
         [(2, 0), (2, 1), (2, 2)],
