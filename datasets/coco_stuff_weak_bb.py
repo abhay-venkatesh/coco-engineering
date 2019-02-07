@@ -297,7 +297,6 @@ def verify_coco_stuff_weak_bb(
             "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb")):
     train_loader, val_loader, _ = get_coco_sky_weak_bb(
         data_root=filtered_data_root, batch_size=1)
-    # i = random.randint(len(val_loader))
 
     for image, labels in train_loader:
         img_tensor = image.squeeze(0)
