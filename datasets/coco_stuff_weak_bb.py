@@ -110,7 +110,7 @@ def _draw_random_bbox_from_seg(coco, img_id, seg_array):
     x, y, mask_width, mask_height = _random_bbox(seg_boundary)
     rect = _get_rect(x, y, mask_width, mask_height, 0)
     draw.polygon([tuple(p) for p in rect], fill=1)
-    np_seg = np.asarray(seg)
+    np_seg = np.asarray(seg, dtype=int)
     return np_seg
 
 
@@ -141,10 +141,55 @@ def _preview_mask(seg):
     input("Press Enter to continue...")
 
 
+def _filter_bounding_boxes(coco,
+                           img_id,
+                           seg_array,
+                           filtered_data_location,
+                           n_samples=10):
+    assert n_samples >= 1, (
+        "Need to have at least one sample for creating bounding boxes. ")
+
+    if not os.path.exists(Path(filtered_data_location, "bbox")):
+        os.makedirs(Path(filtered_data_location, "bbox"))
+
+    for i in range(n_samples):
+        bbox = _draw_random_bbox_from_seg(coco, img_id, seg_array)
+        bbox = Image.fromarray(bbox).convert("L")
+        bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(
+            ".jpg", "-" + str(i) + ".png")
+        bbox_path = Path(filtered_data_location, "bbox", bbox_name)
+        bbox.save(bbox_path)
+
+
+def _filter_agg_bounding_boxes(coco,
+                               img_id,
+                               seg_array,
+                               filtered_data_location,
+                               n_samples=10):
+    # Filters, and aggregates bounding boxes into a single mask
+    assert n_samples >= 1, (
+        "Need to have at least one sample for creating bounding boxes. ")
+
+    if not os.path.exists(Path(filtered_data_location, "bbox")):
+        os.makedirs(Path(filtered_data_location, "bbox"))
+
+    bbox = _draw_random_bbox_from_seg(coco, img_id, seg_array)
+    print(bbox)
+    for i in range(1, n_samples):
+        bbox_ = bbox | _draw_random_bbox_from_seg(coco, img_id, seg_array)
+        bbox = bbox_
+
+    bbox = Image.fromarray(bbox).convert("L")
+    bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(".jpg", "-0.png")
+    bbox_path = Path(filtered_data_location, "bbox", bbox_name)
+    bbox.save(bbox_path)
+
+
 def _filter_dataset(ann_file_path,
                     data_root,
                     target_supercategories,
                     filtered_data_location,
+                    bbox_type,
                     fraction=1.0):
     coco = COCO(ann_file_path)
     img_ids = coco.getImgIds()
@@ -174,17 +219,12 @@ def _filter_dataset(ann_file_path,
                     os.makedirs(Path(filtered_data_location, "annotations/"))
                 seg.save(seg_path)
 
-                # Filter bounding boxes
-                for i in range(10):
-                    bbox = _draw_random_bbox_from_seg(coco, img_id, seg_array)
-                    bbox = Image.fromarray(bbox).convert("L")
-                    bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(
-                        ".jpg", "-" + str(i) + ".png")
-                    bbox_path = Path(filtered_data_location, "bbox", bbox_name)
-                    if not os.path.exists(
-                            Path(filtered_data_location, "bbox")):
-                        os.makedirs(Path(filtered_data_location, "bbox"))
-                    bbox.save(bbox_path)
+                if bbox_type == "aggregated":
+                    _filter_agg_bounding_boxes(coco, img_id, seg_array,
+                                               filtered_data_location)
+                else:
+                    _filter_bounding_boxes(coco, img_id, seg_array,
+                                           filtered_data_location)
 
     # Filter the annotations.csv file
     filtered_ann_path = Path(filtered_data_location, "annotations.csv")
@@ -208,7 +248,13 @@ def build_coco_stuff_weak_bb(
         filtered_data_root=Path(
             "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb"),
         target_supercategories=["sky"],
+        bbox_type="aggregated",
         should_download=False):
+    """
+    args:
+        bbox_type in ["aggregated", "separate"]
+
+    """
     if not os.path.exists(filtered_data_root):
         os.makedirs(filtered_data_root)
 
@@ -222,7 +268,7 @@ def build_coco_stuff_weak_bb(
 
         _filter_dataset(split["ann_file"], split["data_root"],
                         target_supercategories, filtered_split_folder,
-                        split["fraction"])
+                        bbox_type, split["fraction"])
 
 
 def verify_coco_stuff_weak_bb(
@@ -237,13 +283,13 @@ def verify_coco_stuff_weak_bb(
         img = transforms.ToPILImage()(img_tensor)
         img.show()
         input("Press Enter to continue...")
-        
+
         mask_array = labels[0].squeeze(0).numpy()
         mask_array *= 100
         mask = Image.fromarray(mask_array)
         mask.show()
         input("Press Enter to continue...")
-        
+
         bbox_array = labels[1].squeeze(0).numpy()
         bbox_array *= 100
         bbox = Image.fromarray(bbox_array)
@@ -258,13 +304,13 @@ def verify_coco_stuff_weak_bb(
             img = transforms.ToPILImage()(img_tensor)
             img.show()
             input("Press Enter to continue...")
-            
+
             mask_array = labels[0].squeeze(0).numpy()
             mask_array *= 100
             mask = Image.fromarray(mask_array)
             mask.show()
             input("Press Enter to continue...")
-            
+
             bbox_array = labels[1].squeeze(0).numpy()
             bbox_array *= 100
             bbox = Image.fromarray(bbox_array)
