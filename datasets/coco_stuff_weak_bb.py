@@ -51,6 +51,20 @@ else:
         "/mnt/hdd-4tb/abhay/datasets/coco_stuff_sky_weak_bb")
     if not os.path.exists(FILTERED_DATA_ROOT):
         os.makedirs(FILTERED_DATA_ROOT)
+    SPLITS = [
+        {
+            "name": "train",
+            "ann_file": TRAIN_ANN_FILE,
+            "data_root": TRAIN_DATA_ROOT,
+            "fraction": 0.1
+        },
+        {
+            "name": "val",
+            "ann_file": VAL_ANN_FILE,
+            "data_root": VAL_DATA_ROOT,
+            "fraction": 0.01
+        },
+    ]
 
 
 def _random_bbox(bbox):
