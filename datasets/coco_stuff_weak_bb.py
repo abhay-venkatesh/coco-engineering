@@ -165,17 +165,16 @@ def _filter_agg_bounding_boxes(coco,
                                img_id,
                                seg_array,
                                filtered_data_location,
-                               n_samples=10):
+                               n_boxes=10):
     # Filters, and aggregates bounding boxes into a single mask
-    assert n_samples >= 1, (
-        "Need to have at least one sample for creating bounding boxes. ")
+    assert n_boxes >= 1, ("Need to have at least one bounding box. ")
 
     if not os.path.exists(Path(filtered_data_location, "bbox")):
         os.makedirs(Path(filtered_data_location, "bbox"))
 
     bbox = _draw_random_bbox_from_seg(coco, img_id, seg_array)
     print(bbox)
-    for i in range(1, n_samples):
+    for i in range(1, n_boxes):
         bbox_ = bbox | _draw_random_bbox_from_seg(coco, img_id, seg_array)
         bbox = bbox_
 
@@ -185,17 +184,43 @@ def _filter_agg_bounding_boxes(coco,
     bbox.save(bbox_path)
 
 
+def _filter_annotations_file(coco, img_ids, target_cat_ids,
+                             filtered_data_location, n_boxes, bbox_type,
+                             fraction):
+    filtered_ann_path = Path(filtered_data_location, "annotations.csv")
+    with open(filtered_ann_path, mode='w', newline='') as filtered_ann_file:
+        writer = csv.writer(
+            filtered_ann_file,
+            delimiter=',',
+            quotechar='"',
+            quoting=csv.QUOTE_MINIMAL)
+        for img_id in img_ids:
+            ann_ids = coco.getAnnIds(imgIds=img_id)
+            anns = coco.loadAnns(ann_ids)
+            for ann in anns:
+                if ann["category_id"] in target_cat_ids:
+                    if bbox_type == "aggregated":
+                        img_name = coco.loadImgs(img_id)[0]['file_name']
+                        writer.writerow([img_name, 0])
+                    else:
+                        for i in range(n_boxes):
+                            img_name = coco.loadImgs(img_id)[0]['file_name']
+                            writer.writerow([img_name, 0])
+
+
 def _filter_dataset(ann_file_path,
                     data_root,
                     target_supercategories,
                     filtered_data_location,
                     bbox_type,
+                    n_boxes=10,
                     fraction=1.0):
     coco = COCO(ann_file_path)
     img_ids = coco.getImgIds()
+    img_ids = img_ids[:int(fraction * len(img_ids))]
     target_cat_ids = coco.getCatIds(supNms=target_supercategories)
 
-    for img_id in tqdm(img_ids[:int(fraction * len(img_ids))]):
+    for img_id in tqdm(img_ids):
         ann_ids = coco.getAnnIds(imgIds=img_id)
         anns = coco.loadAnns(ann_ids)
         for ann in anns:
@@ -221,27 +246,14 @@ def _filter_dataset(ann_file_path,
 
                 if bbox_type == "aggregated":
                     _filter_agg_bounding_boxes(coco, img_id, seg_array,
-                                               filtered_data_location)
+                                               filtered_data_location, n_boxes)
                 else:
                     _filter_bounding_boxes(coco, img_id, seg_array,
-                                           filtered_data_location)
+                                           filtered_data_location, n_boxes)
 
-    # Filter the annotations.csv file
-    filtered_ann_path = Path(filtered_data_location, "annotations.csv")
-    with open(filtered_ann_path, mode='w', newline='') as filtered_ann_file:
-        writer = csv.writer(
-            filtered_ann_file,
-            delimiter=',',
-            quotechar='"',
-            quoting=csv.QUOTE_MINIMAL)
-        for img_id in img_ids[:int(fraction * len(img_ids))]:
-            ann_ids = coco.getAnnIds(imgIds=img_id)
-            anns = coco.loadAnns(ann_ids)
-            for ann in anns:
-                if ann["category_id"] in target_cat_ids:
-                    for i in range(10):
-                        img_name = coco.loadImgs(img_id)[0]['file_name']
-                        writer.writerow([img_name, i])
+    _filter_annotations_file(coco, img_ids, target_cat_ids,
+                             filtered_data_location, n_boxes, bbox_type,
+                             fraction)
 
 
 def build_coco_stuff_weak_bb(
