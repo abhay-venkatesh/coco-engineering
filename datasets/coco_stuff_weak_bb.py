@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw
+from lib.coco import get_coco_sky_weak_bb
 from pathlib import Path
 from pycocotools.coco import COCO
 from tqdm import tqdm
@@ -7,6 +8,7 @@ import numpy as np
 import os
 import random
 import shutil
+import torchvision.transforms as transforms
 
 if os.name == "nt":
     TRAIN_ANN_FILE = Path(
@@ -17,10 +19,6 @@ if os.name == "nt":
         "D:/code/data/cocostuff/dataset/annotations/stuff_val2017.json")
     VAL_DATA_ROOT = Path("D:/code/data/cocostuff/dataset/images/val2017")
 
-    FILTERED_DATA_ROOT = Path(
-        "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb")
-    if not os.path.exists(FILTERED_DATA_ROOT):
-        os.makedirs(FILTERED_DATA_ROOT)
     SPLITS = [
         {
             "name": "train",
@@ -49,8 +47,7 @@ else:
 
     FILTERED_DATA_ROOT = Path(
         "/mnt/hdd-4tb/abhay/datasets/coco_stuff_sky_weak_bb")
-    if not os.path.exists(FILTERED_DATA_ROOT):
-        os.makedirs(FILTERED_DATA_ROOT)
+
     SPLITS = [
         {
             "name": "train",
@@ -207,16 +204,70 @@ def _filter_dataset(ann_file_path,
                         writer.writerow([img_name, i])
 
 
-def build_coco_stuff_weak_bb(target_supercategories=["sky"],
-                             should_download=False):
+def build_coco_stuff_weak_bb(
+        filtered_data_root=Path(
+            "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb"),
+        target_supercategories=["sky"],
+        should_download=False):
+    if not os.path.exists(filtered_data_root):
+        os.makedirs(filtered_data_root)
+
     if should_download:
         raise NotImplementedError("Download functionality not implemented. ")
 
     for split in SPLITS:
-        filtered_split_folder = Path(FILTERED_DATA_ROOT, split["name"])
+        filtered_split_folder = Path(filtered_data_root, split["name"])
         if not os.path.exists(filtered_split_folder):
             os.mkdir(filtered_split_folder)
 
         _filter_dataset(split["ann_file"], split["data_root"],
                         target_supercategories, filtered_split_folder,
                         split["fraction"])
+
+
+def verify_coco_stuff_weak_bb(
+        filtered_data_root=Path(
+            "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb")):
+    train_loader, val_loader, _ = get_coco_sky_weak_bb(
+        data_root=filtered_data_root, batch_size=1)
+    # i = random.randint(len(val_loader))
+
+    for image, labels in train_loader:
+        img_tensor = image.squeeze(0)
+        img = transforms.ToPILImage()(img_tensor)
+        img.show()
+        input("Press Enter to continue...")
+        
+        mask_array = labels[0].squeeze(0).numpy()
+        mask_array *= 100
+        mask = Image.fromarray(mask_array)
+        mask.show()
+        input("Press Enter to continue...")
+        
+        bbox_array = labels[1].squeeze(0).numpy()
+        bbox_array *= 100
+        bbox = Image.fromarray(bbox_array)
+        bbox.show()
+        input("Press Enter to continue...")
+        break
+
+    ri = random.randint(0, len(val_loader))
+    for i, (image, labels) in enumerate(val_loader):
+        if i == ri:
+            img_tensor = image.squeeze(0)
+            img = transforms.ToPILImage()(img_tensor)
+            img.show()
+            input("Press Enter to continue...")
+            
+            mask_array = labels[0].squeeze(0).numpy()
+            mask_array *= 100
+            mask = Image.fromarray(mask_array)
+            mask.show()
+            input("Press Enter to continue...")
+            
+            bbox_array = labels[1].squeeze(0).numpy()
+            bbox_array *= 100
+            bbox = Image.fromarray(bbox_array)
+            bbox.show()
+            input("Press Enter to continue...")
+            break
