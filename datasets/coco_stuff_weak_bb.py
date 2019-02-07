@@ -111,23 +111,6 @@ def _draw_random_bbox_from_seg(coco, img_id, seg_array):
     draw = ImageDraw.Draw(seg)
     seg_boundary = _get_seg_boundary(seg_array)
     x, y, mask_width, mask_height = _random_bbox(seg_boundary)
-    # x, y, mask_width, mask_height = seg_boundary
-    rect = _get_rect(x, y, mask_width, mask_height, 0)
-    draw.polygon([tuple(p) for p in rect], fill=1)
-    np_seg = np.asarray(seg)
-    return np_seg
-
-
-def _draw_bbox_mask(coco, img_id, bbox):
-    """ We want to get 10 bounding boxes per image. In order to do that,
-        we need to:
-        1. Convert (x, y, width, height) into 4 coordinates
-        2. Generate random 4 coordinates bounded by those 4 coordinates """
-    img_height = coco.loadImgs(img_id)[0]['height']
-    img_width = coco.loadImgs(img_id)[0]['width']
-    seg = Image.fromarray(np.zeros((img_height, img_width)))
-    draw = ImageDraw.Draw(seg)
-    x, y, mask_width, mask_height = bbox
     rect = _get_rect(x, y, mask_width, mask_height, 0)
     draw.polygon([tuple(p) for p in rect], fill=1)
     np_seg = np.asarray(seg)
@@ -166,7 +149,6 @@ def _filter_dataset(ann_file_path,
                     target_supercategories,
                     filtered_data_location,
                     fraction=1.0):
-    """ Filters out image/segmentation pairs that contain the target class. """
     coco = COCO(ann_file_path)
     img_ids = coco.getImgIds()
     target_cat_ids = coco.getCatIds(supNms=target_supercategories)
