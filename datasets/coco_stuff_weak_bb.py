@@ -173,7 +173,6 @@ def _filter_agg_bounding_boxes(coco,
         os.makedirs(Path(filtered_data_location, "bbox"))
 
     bbox = _draw_random_bbox_from_seg(coco, img_id, seg_array)
-    print(bbox)
     for i in range(1, n_boxes):
         bbox_ = bbox | _draw_random_bbox_from_seg(coco, img_id, seg_array)
         bbox = bbox_
@@ -182,6 +181,7 @@ def _filter_agg_bounding_boxes(coco,
     bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(".jpg", "-0.png")
     bbox_path = Path(filtered_data_location, "bbox", bbox_name)
     bbox.save(bbox_path)
+    _preview_mask(bbox)
 
 
 def _filter_annotations_file(coco, img_ids, target_cat_ids,
@@ -232,6 +232,7 @@ def _filter_dataset(ann_file_path,
                 if not os.path.exists(Path(filtered_data_location, "images")):
                     os.makedirs(Path(filtered_data_location, "images"))
                 shutil.copyfile(img_path, img_path_)
+                _preview_image(coco, img_id, data_root)
 
                 seg_array = coco.annToMask(ann)
                 seg = Image.fromarray(seg_array)
@@ -243,6 +244,7 @@ def _filter_dataset(ann_file_path,
                         Path(filtered_data_location, "annotations")):
                     os.makedirs(Path(filtered_data_location, "annotations/"))
                 seg.save(seg_path)
+                _preview_mask(seg)
 
                 if bbox_type == "aggregated":
                     _filter_agg_bounding_boxes(coco, img_id, seg_array,
@@ -261,6 +263,7 @@ def build_coco_stuff_weak_bb(
             "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb"),
         target_supercategories=["sky"],
         bbox_type="aggregated",
+        n_boxes=10,
         should_download=False):
     """
     args:
@@ -280,7 +283,7 @@ def build_coco_stuff_weak_bb(
 
         _filter_dataset(split["ann_file"], split["data_root"],
                         target_supercategories, filtered_split_folder,
-                        bbox_type, split["fraction"])
+                        bbox_type, n_boxes, split["fraction"])
 
 
 def verify_coco_stuff_weak_bb(
