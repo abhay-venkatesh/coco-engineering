@@ -201,7 +201,7 @@ def _filter_dataset(ann_file_path,
             delimiter=',',
             quotechar='"',
             quoting=csv.QUOTE_MINIMAL)
-        for img_id in img_ids:
+        for img_id in img_ids[:int(fraction * len(img_ids))]:
             ann_ids = coco.getAnnIds(imgIds=img_id)
             anns = coco.loadAnns(ann_ids)
             for ann in anns:
