@@ -133,6 +133,7 @@ def _filter_agg_bounding_boxes(coco,
         bbox_ = bbox | _draw_random_bbox_from_seg(coco, img_id, seg_array)
         bbox = bbox_
 
+    bbox = np.array(bbox, dtype=np.uint8)
     bbox = Image.fromarray(bbox).convert("L")
     bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(".jpg", "-0.png")
     bbox_path = Path(filtered_data_location, "bbox", bbox_name)
