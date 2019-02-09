@@ -10,56 +10,6 @@ import random
 import shutil
 import torchvision.transforms as transforms
 
-if os.name == "nt":
-    TRAIN_ANN_FILE = Path(
-        "D:/code/data/cocostuff/dataset/annotations/stuff_train2017.json")
-    TRAIN_DATA_ROOT = Path("D:/code/data/cocostuff/dataset/images/train2017")
-
-    VAL_ANN_FILE = Path(
-        "D:/code/data/cocostuff/dataset/annotations/stuff_val2017.json")
-    VAL_DATA_ROOT = Path("D:/code/data/cocostuff/dataset/images/val2017")
-
-    SPLITS = [
-        {
-            "name": "train",
-            "ann_file": TRAIN_ANN_FILE,
-            "data_root": TRAIN_DATA_ROOT,
-            "fraction": 0.1
-        },
-        {
-            "name": "val",
-            "ann_file": VAL_ANN_FILE,
-            "data_root": VAL_DATA_ROOT,
-            "fraction": 0.01
-        },
-    ]
-
-else:
-    TRAIN_ANN_FILE = Path(
-        "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_train2017.json"
-    )
-    TRAIN_DATA_ROOT = Path(
-        "/mnt/hdd-4tb/abhay/cocostuff/dataset/images/train2017")
-
-    VAL_ANN_FILE = Path(
-        "/mnt/hdd-4tb/abhay/cocostuff/dataset/annotations/stuff_val2017.json")
-    VAL_DATA_ROOT = Path("/mnt/hdd-4tb/abhay/cocostuff/dataset/images/val2017")
-
-    SPLITS = [
-        {
-            "name": "train",
-            "ann_file": TRAIN_ANN_FILE,
-            "data_root": TRAIN_DATA_ROOT,
-            "fraction": 0.1
-        },
-        {
-            "name": "val",
-            "ann_file": VAL_ANN_FILE,
-            "data_root": VAL_DATA_ROOT,
-            "fraction": 0.01
-        },
-    ]
-
 
 def _random_bbox(seg_array, smoothing=2):
     """ For example, let
@@ -73,7 +23,7 @@ def _random_bbox(seg_array, smoothing=2):
     xb, yb, wb, hb = 0, 0, 5, 2 """
     _, _, wb, hb = _get_seg_boundary(seg_array)
     rows, cols = np.nonzero(seg_array)
-    ri = random.randint(0, len(rows)-1)
+    ri = random.randint(0, len(rows) - 1)
     """ Then,
     y in [0, 1]
     x in [0, 1, 2, 3, 4] """
@@ -264,39 +214,25 @@ def _filter_dataset(ann_file_path,
                              fraction)
 
 
-def build_coco_stuff_weak_bb(
-        filtered_data_root=Path(
-            "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb"),
-        target_supercategories=["sky"],
-        bbox_type="aggregated",
-        n_boxes=10,
-        should_download=False):
-    """
-    args:
-        bbox_type in ["aggregated", "separate"]
+def build_coco_stuff_weak_bb(config):
+    if not os.path.exists(config["filtered_data_root"]):
+        os.makedirs(config["filtered_data_root"])
 
-    """
-    if not os.path.exists(filtered_data_root):
-        os.makedirs(filtered_data_root)
-
-    if should_download:
-        raise NotImplementedError("Download functionality not implemented. ")
-
-    for split in SPLITS:
-        filtered_split_folder = Path(filtered_data_root, split["name"])
+    for split in config["splits"]:
+        filtered_split_folder = Path(config["filtered_data_root"],
+                                     split["name"])
         if not os.path.exists(filtered_split_folder):
             os.mkdir(filtered_split_folder)
 
         _filter_dataset(split["ann_file"], split["data_root"],
-                        target_supercategories, filtered_split_folder,
-                        bbox_type, n_boxes, split["fraction"])
+                        config["target_supercategories"],
+                        filtered_split_folder, config["bbox_type"],
+                        config["n_boxes"], split["fraction"])
 
 
-def verify_coco_stuff_weak_bb(
-        filtered_data_root=Path(
-            "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb")):
+def verify_coco_stuff_weak_bb(config):
     train_loader, val_loader, _ = get_coco_sky_weak_bb(
-        data_root=filtered_data_root, batch_size=1)
+        data_root=config["filtered_data_root"], batch_size=1)
 
     for image, labels in train_loader:
         img_tensor = image.squeeze(0)
