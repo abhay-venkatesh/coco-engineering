@@ -10,7 +10,7 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 
 
-def get_coco_stuf_loaders(data_root, batch_size=None):
+def get_coco_stuff_loaders(data_root, batch_size=None):
     train_data_path = Path(data_root, "train")
     val_data_path = Path(data_root, "val")
 

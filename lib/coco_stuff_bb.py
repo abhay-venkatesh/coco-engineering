@@ -1,7 +1,7 @@
 """ Coco Stuff with Bounding Boxes """
 
 from PIL import Image, ImageDraw
-from lib.coco import get_coco_stuf_loaders
+from lib.coco import get_coco_stuff_loaders
 from pathlib import Path
 from pycocotools.coco import COCO
 from tqdm import tqdm
@@ -258,7 +258,7 @@ def build_coco_stuff_bb(paths, config):
 
 
 def verify_coco_stuff_weak_bb(config):
-    train_loader, val_loader, _ = get_coco_stuf_loaders(
+    train_loader, val_loader, _ = get_coco_stuff_loaders(
         data_root=config["filtered_data_root"], batch_size=1)
 
     for image, labels in train_loader:
@@ -300,3 +300,5 @@ def verify_coco_stuff_weak_bb(config):
             bbox.show()
             input("Press Enter to continue...")
             break
+
+def compute_noise_statistics()
