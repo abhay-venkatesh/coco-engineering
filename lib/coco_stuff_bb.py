@@ -11,6 +11,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pickle
 import random
 import shutil
 import torchvision.transforms as transforms
@@ -311,15 +312,25 @@ def compute_noise_histogram(paths, config):
         P(B=0|Y=1) = (B[Y == 1] == 0).sum() / (Y == 1).sum()
 
     """
-    data_root = Path(paths["filtered_data_root"], config["name"])
-    train_loader, _, _ = get_coco_stuff_loaders(
-        data_root=data_root, batch_size=1)
+    if not os.path.exists(Path("cache")):
+        os.mkdir(Path("cache"))
 
     xs = []
-    for _, labels in tqdm(train_loader):
-        Y = labels[0].squeeze(0).numpy()
-        B = labels[1].squeeze(0).numpy()
-        xs.append((B[Y == 1] == 0).sum() / (Y == 1).sum())
+    if os.path.exists(Path("cache", config["name"])):
+        with open(Path("cache", config["name"]), 'rb') as fp:
+            xs = pickle.load(fp)
+    else:
+        data_root = Path(paths["filtered_data_root"], config["name"])
+        train_loader, _, _ = get_coco_stuff_loaders(
+            data_root=data_root, batch_size=1)
+
+        for _, labels in tqdm(train_loader):
+            Y = labels[0].squeeze(0).numpy()
+            B = labels[1].squeeze(0).numpy()
+            xs.append((B[Y == 1] == 0).sum() / (Y == 1).sum())
+       
+        with open(Path("cache", config["name"]), 'wb') as fp:
+            pickle.dump(xs, fp) 
 
     # best fit of data
     (mu, sigma) = norm.fit(xs)
@@ -335,7 +346,7 @@ def compute_noise_histogram(paths, config):
     # plot
     plt.xlabel('Smarts')
     plt.ylabel('Probability')
-    plt.title(
-        r'$\mathrm{Histogram\ of\ IQ:}\ \mu=%.3f,\ \sigma=%.3f$' % (mu, sigma))
+    plt.title(r'$\mathrm{Histogram\ of\ \rho:}\ \mu=%.3f,\ \sigma=%.3f$' %
+              (mu, sigma))
     plt.grid(True)
     plt.savefig("noise_histogram.png")
