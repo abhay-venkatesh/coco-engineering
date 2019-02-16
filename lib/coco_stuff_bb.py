@@ -154,7 +154,7 @@ def _filter_full_bounding_boxes(coco, img_id, ann, filtered_data_location):
     x, y, w, h = ann["bbox"]
     rect = _get_rect(x, y, w, h, 0)
     draw.polygon([tuple(p) for p in rect], fill=1)
-    bbox = np.asarray(seg, dtype=int)
+    bbox = np.asarray(seg, dtype=np.uint8)
     bbox = Image.fromarray(bbox).convert("L")
     bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(".jpg", "-0.png")
     bbox_path = Path(filtered_data_location, "bbox", bbox_name)
