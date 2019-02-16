@@ -1,0 +1,10 @@
+name: pu_bb
+target supercategories:
+- sky
+bbox type: aggregated
+number of boxes: 10
+splits:
+- name: train
+  fraction: 0.1
+- name: val
+  fraction: 0.01

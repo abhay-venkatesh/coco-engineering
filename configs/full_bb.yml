@@ -1,0 +1,10 @@
+name: full_bb
+target supercategories:
+- sky
+bbox type: full
+number of boxes: N/A
+splits:
+- name: train
+  fraction: 0.1
+- name: val
+  fraction: 0.01

@@ -1,3 +1,5 @@
+""" Coco Stuff with PU-Labeled Bounding Boxes """
+
 from PIL import Image, ImageDraw
 from lib.coco import get_coco_sky_weak_bb
 from pathlib import Path
@@ -141,6 +143,22 @@ def _filter_agg_bounding_boxes(coco,
     bbox.save(bbox_path)
 
 
+def _filter_full_bounding_boxes(coco, img_id, ann, filtered_data_location):
+    if not os.path.exists(Path(filtered_data_location, "bbox")):
+        os.makedirs(Path(filtered_data_location, "bbox"))
+
+    img_height = coco.loadImgs(img_id)[0]['height']
+    img_width = coco.loadImgs(img_id)[0]['width']
+    seg = Image.fromarray(np.zeros((img_height, img_width)))
+    draw = ImageDraw.Draw(seg)
+    x, y, w, h = ann["bbox"]
+    rect = _get_rect(x, y, w, h, 0)
+    draw.polygon([tuple(p) for p in rect], fill=1)
+    np_seg = np.asarray(seg, dtype=int)
+    _preview_mask(np_seg)
+    return np_seg
+
+
 def _filter_annotations_file(coco, img_ids, target_cat_ids,
                              filtered_data_location, n_boxes, bbox_type,
                              fraction):
@@ -206,6 +224,9 @@ def _filter_dataset(ann_file_path,
                 if bbox_type == "aggregated":
                     _filter_agg_bounding_boxes(coco, img_id, seg_array,
                                                filtered_data_location, n_boxes)
+                elif bbox_type == "full":
+                    _filter_full_bounding_boxes(coco, img_id, ann,
+                                                filtered_data_location)
                 else:
                     _filter_bounding_boxes(coco, img_id, seg_array,
                                            filtered_data_location, n_boxes)
@@ -215,20 +236,25 @@ def _filter_dataset(ann_file_path,
                              fraction)
 
 
-def build_coco_stuff_weak_bb(config):
-    if not os.path.exists(config["filtered_data_root"]):
-        os.makedirs(config["filtered_data_root"])
+def build_coco_stuff_bb(paths, config):
+    if not os.path.exists(paths["filtered_data_root"]):
+        os.makedirs(paths["filtered_data_root"])
+
+    dataset_root = Path(paths["filtered_data_root"], config["name"])
+    if not os.path.exists(dataset_root):
+        os.makedirs(dataset_root)
 
     for split in config["splits"]:
-        filtered_split_folder = Path(config["filtered_data_root"],
-                                     split["name"])
+        filtered_split_folder = Path(dataset_root, split["name"])
         if not os.path.exists(filtered_split_folder):
             os.mkdir(filtered_split_folder)
 
-        _filter_dataset(split["ann_file"], split["data_root"],
-                        config["target_supercategories"],
-                        filtered_split_folder, config["bbox_type"],
-                        config["n_boxes"], split["fraction"])
+        ann_file_name = split["name"] + "_ann_file"
+        root_name = split["name"] + "_root"
+        _filter_dataset(paths[ann_file_name], paths[root_name],
+                        config["target supercategories"],
+                        filtered_split_folder, config["bbox type"],
+                        config["number of boxes"], split["fraction"])
 
 
 def verify_coco_stuff_weak_bb(config):
