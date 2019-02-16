@@ -4,8 +4,11 @@ from PIL import Image, ImageDraw
 from lib.coco import get_coco_stuff_loaders
 from pathlib import Path
 from pycocotools.coco import COCO
+from scipy.stats import norm
 from tqdm import tqdm
 import csv
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 import random
@@ -257,9 +260,10 @@ def build_coco_stuff_bb(paths, config):
                         config["number of boxes"], split["fraction"])
 
 
-def verify_coco_stuff_weak_bb(config):
+def verify_coco_stuff_weak_bb(paths, config):
+    data_root = Path(paths["filtered_data_root"], config["name"])
     train_loader, val_loader, _ = get_coco_stuff_loaders(
-        data_root=config["filtered_data_root"], batch_size=1)
+        data_root=data_root, batch_size=1)
 
     for image, labels in train_loader:
         img_tensor = image.squeeze(0)
@@ -301,4 +305,37 @@ def verify_coco_stuff_weak_bb(config):
             input("Press Enter to continue...")
             break
 
-def compute_noise_statistics()
+
+def compute_noise_histogram(paths, config):
+    """ Want to compute:
+        P(B=0|Y=1) = (B[Y == 1] == 0).sum() / (Y == 1).sum()
+
+    """
+    data_root = Path(paths["filtered_data_root"], config["name"])
+    train_loader, _, _ = get_coco_stuff_loaders(
+        data_root=data_root, batch_size=1)
+
+    xs = []
+    for _, labels in tqdm(train_loader):
+        Y = labels[0].squeeze(0).numpy()
+        B = labels[1].squeeze(0).numpy()
+        xs.append((B[Y == 1] == 0).sum() / (Y == 1).sum())
+
+    # best fit of data
+    (mu, sigma) = norm.fit(xs)
+
+    # the histogram of the data
+    n, bins, patches = plt.hist(
+        xs, 60, density=1, facecolor='orange', alpha=0.75)
+
+    # add a 'best fit' line
+    y = mlab.normpdf(bins, mu, sigma)
+    plt.plot(bins, y, 'r--', linewidth=2, color="firebrick")
+
+    # plot
+    plt.xlabel('Smarts')
+    plt.ylabel('Probability')
+    plt.title(
+        r'$\mathrm{Histogram\ of\ IQ:}\ \mu=%.3f,\ \sigma=%.3f$' % (mu, sigma))
+    plt.grid(True)
+    plt.savefig("noise_histogram.png")

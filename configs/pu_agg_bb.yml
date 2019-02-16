@@ -1,4 +1,4 @@
-name: pu_bb
+name: pu_agg_bb
 target supercategories:
 - sky
 bbox type: aggregated

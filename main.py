@@ -1,9 +1,9 @@
-from lib.coco_stuff_bb import build_coco_stuff_bb
+from lib.coco_stuff_bb import compute_noise_histogram
 from pathlib import Path
 import os
 import yaml
 
-CONFIG_FILE_PATH = "./configs/full_bb.yml"
+CONFIG_FILE_PATH = "./configs/pu_agg_bb.yml"
 
 
 def get_config():
@@ -51,4 +51,5 @@ def get_ubuntu_paths():
 if __name__ == "__main__":
     paths = get_windows_paths() if os.name == "nt" else get_ubuntu_paths()
     config = get_config()
-    build_coco_stuff_bb(paths, config)
+    # build_coco_stuff_bb(paths, config)
+    compute_noise_histogram(paths, config)
