@@ -1,4 +1,4 @@
-from datasets.coco_stuff_bb import build_coco_stuff_bb
+from lib.coco_stuff_bb import build_coco_stuff_bb
 from pathlib import Path
 import os
 import yaml

@@ -1,4 +1,4 @@
-""" Coco Stuff with PU-Labeled Bounding Boxes """
+""" Coco Stuff with Bounding Boxes """
 
 from PIL import Image, ImageDraw
 from lib.coco import get_coco_sky_weak_bb
@@ -154,9 +154,12 @@ def _filter_full_bounding_boxes(coco, img_id, ann, filtered_data_location):
     x, y, w, h = ann["bbox"]
     rect = _get_rect(x, y, w, h, 0)
     draw.polygon([tuple(p) for p in rect], fill=1)
-    np_seg = np.asarray(seg, dtype=int)
-    _preview_mask(np_seg)
-    return np_seg
+    bbox = np.asarray(seg, dtype=int)
+    bbox = Image.fromarray(bbox).convert("L")
+    bbox_name = coco.loadImgs(img_id)[0]['file_name'].replace(".jpg", "-0.png")
+    bbox_path = Path(filtered_data_location, "bbox", bbox_name)
+    # _preview_mask(bbox)
+    bbox.save(bbox_path)
 
 
 def _filter_annotations_file(coco, img_ids, target_cat_ids,

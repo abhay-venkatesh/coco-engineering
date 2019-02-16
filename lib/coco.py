@@ -14,13 +14,7 @@ IMG_HEIGHT = 426
 IMG_WIDTH = 640
 
 
-def get_coco_sky_weak_bb(data_root=None, batch_size=None):
-    if not data_root:
-        data_root = Path(
-            "D:/code/data/filtered_datasets/coco_stuff_sky_weak_bb"
-        ) if os.name == "nt" else Path(
-            "/mnt/hdd-4tb/abhay/datasets/coco_stuff_sky_weak_bb")
-
+def get_coco_sky_weak_bb(data_root, batch_size=None):
     train_data_path = Path(data_root, "train")
     val_data_path = Path(data_root, "val")
 
