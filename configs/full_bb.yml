@@ -2,7 +2,7 @@ name: full_bb
 target supercategories:
 - sky
 bbox type: full
-number of boxes: N/A
+number of boxes: 1
 splits:
 - name: train
   fraction: 0.1

@@ -177,13 +177,9 @@ def _filter_annotations_file(coco, img_ids, target_cat_ids,
             anns = coco.loadAnns(ann_ids)
             for ann in anns:
                 if ann["category_id"] in target_cat_ids:
-                    if bbox_type == "aggregated":
+                    for i in range(n_boxes):
                         img_name = coco.loadImgs(img_id)[0]['file_name']
-                        writer.writerow([img_name, 0])
-                    else:
-                        for i in range(n_boxes):
-                            img_name = coco.loadImgs(img_id)[0]['file_name']
-                            writer.writerow([img_name, 0])
+                        writer.writerow([img_name, i])
 
 
 def _filter_dataset(ann_file_path,

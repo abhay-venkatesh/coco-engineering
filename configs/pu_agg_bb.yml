@@ -2,7 +2,7 @@ name: pu_bb
 target supercategories:
 - sky
 bbox type: aggregated
-number of boxes: 10
+number of boxes: 1
 splits:
 - name: train
   fraction: 0.1
