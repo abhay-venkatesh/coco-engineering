@@ -244,8 +244,9 @@ def build_coco_stuff_bb(paths, config):
         os.makedirs(paths["filtered_data_root"])
 
     dataset_root = Path(paths["filtered_data_root"], config["name"])
-    if not os.path.exists(dataset_root):
-        os.makedirs(dataset_root)
+    if os.path.exists(dataset_root):
+        shutil.rmtree(dataset_root)
+    os.makedirs(dataset_root)
 
     for split in config["splits"]:
         filtered_split_folder = Path(dataset_root, split["name"])
