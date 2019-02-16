@@ -79,7 +79,7 @@ def compute_noise_histogram(paths, config):
             B = labels[1].squeeze(0).numpy()
             xs.append((B[Y == 1] == 0).sum() / (Y == 1).sum())
 
-        with open(cache_file 'wb') as fp:
+        with open(cache_file, 'wb') as fp:
             pickle.dump(xs, fp)
 
     # best fit of data
@@ -139,7 +139,7 @@ def compute_supervision_percentage(paths, config):
             bsum += (labels[1].squeeze(0).numpy() == 1).sum()
 
         supervision_percentage = bsum / ysum
-        with open(Path("cache", config["name"]), 'wb') as fp:
+        with open(cache_file, 'wb') as fp:
             pickle.dump(supervision_percentage, fp)
 
     print(supervision_percentage)
