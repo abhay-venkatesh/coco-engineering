@@ -1,4 +1,4 @@
-from lib.coco_stuff_bb import compute_noise_histogram
+from datasets.coco_stuff.analytics import compute_noise_histogram
 from pathlib import Path
 import os
 import yaml
@@ -51,5 +51,4 @@ def get_ubuntu_paths():
 if __name__ == "__main__":
     paths = get_windows_paths() if os.name == "nt" else get_ubuntu_paths()
     config = get_config()
-    # build_coco_stuff_bb(paths, config)
     compute_noise_histogram(paths, config)
