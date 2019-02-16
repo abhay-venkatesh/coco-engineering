@@ -1,7 +1,7 @@
 """ Coco Stuff with Bounding Boxes """
 
 from PIL import Image, ImageDraw
-from lib.coco import get_coco_sky_weak_bb
+from lib.coco import get_coco_stuf_loaders
 from pathlib import Path
 from pycocotools.coco import COCO
 from tqdm import tqdm
@@ -262,7 +262,7 @@ def build_coco_stuff_bb(paths, config):
 
 
 def verify_coco_stuff_weak_bb(config):
-    train_loader, val_loader, _ = get_coco_sky_weak_bb(
+    train_loader, val_loader, _ = get_coco_stuf_loaders(
         data_root=config["filtered_data_root"], batch_size=1)
 
     for image, labels in train_loader:

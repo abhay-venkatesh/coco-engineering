@@ -9,12 +9,8 @@ import torch
 import torch.utils.data as data
 import torchvision.transforms as transforms
 
-N_CLASSES = 2
-IMG_HEIGHT = 426
-IMG_WIDTH = 640
 
-
-def get_coco_sky_weak_bb(data_root, batch_size=None):
+def get_coco_stuf_loaders(data_root, batch_size=None):
     train_data_path = Path(data_root, "train")
     val_data_path = Path(data_root, "val")
 
@@ -32,10 +28,14 @@ def get_coco_sky_weak_bb(data_root, batch_size=None):
     val_loader = DataLoader(
         dataset=val_dataset, batch_size=batch_size, shuffle=False)
 
-    return train_loader, val_loader, N_CLASSES
+    return train_loader, val_loader, Coco.N_CLASSES
 
 
 class Coco(data.Dataset):
+    N_CLASSES = 2
+    IMG_HEIGHT = 426
+    IMG_WIDTH = 640
+
     def __init__(self, root, ann_file_path):
         self.root = root
         self.img_names = []
@@ -57,7 +57,7 @@ class Coco(data.Dataset):
         img_name = self.img_names[index]
         img_path = Path(self.root, "images", img_name)
         img = Image.open(img_path).convert('RGB')
-        img = img.resize((IMG_WIDTH, IMG_HEIGHT), Image.ANTIALIAS)
+        img = img.resize((self.IMG_WIDTH, self.IMG_HEIGHT), Image.ANTIALIAS)
         img = transforms.ToTensor()(img)
 
         seg_name = img_name.replace(".jpg", ".png")
@@ -65,7 +65,9 @@ class Coco(data.Dataset):
         seg = Image.open(seg_path)
         S = np.array(seg)
         S = resize(
-            S, (IMG_HEIGHT, IMG_WIDTH), anti_aliasing=False, mode='constant')
+            S, (self.IMG_HEIGHT, self.IMG_WIDTH),
+            anti_aliasing=False,
+            mode='constant')
         S = np.where(S > 0, 1, 0)
         seg = torch.from_numpy(S)
 
@@ -75,7 +77,9 @@ class Coco(data.Dataset):
         bbox = Image.open(bbox_path)
         B = np.array(bbox)
         B = resize(
-            B, (IMG_HEIGHT, IMG_WIDTH), anti_aliasing=False, mode='constant')
+            B, (self.IMG_HEIGHT, self.IMG_WIDTH),
+            anti_aliasing=False,
+            mode='constant')
         B = np.where(B > 0, 1, 0)
         bbox = torch.from_numpy(B)
 
