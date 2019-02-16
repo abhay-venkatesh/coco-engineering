@@ -65,8 +65,9 @@ def compute_noise_histogram(paths, config):
         os.mkdir(Path("cache"))
 
     xs = []
-    if os.path.exists(Path("cache", config["name"])):
-        with open(Path("cache", config["name"]), 'rb') as fp:
+    cache_file = Path("cache", config["name"] + "_noise_histogram")
+    if os.path.exists(cache_file):
+        with open(cache_file, 'rb') as fp:
             xs = pickle.load(fp)
     else:
         data_root = Path(paths["filtered_data_root"], config["name"])
@@ -78,7 +79,7 @@ def compute_noise_histogram(paths, config):
             B = labels[1].squeeze(0).numpy()
             xs.append((B[Y == 1] == 0).sum() / (Y == 1).sum())
 
-        with open(Path("cache", config["name"]), 'wb') as fp:
+        with open(cache_file 'wb') as fp:
             pickle.dump(xs, fp)
 
     # best fit of data
@@ -101,8 +102,44 @@ def compute_noise_histogram(paths, config):
     if not os.path.exists(Path("stats")):
         os.mkdir(Path("stats"))
 
-    plt.savefig(Path("stats", config["name"] + "_noise_histogram.png"))
+    histogram_image_file = Path("stats",
+                                config["name"] + "_noise_histogram.png")
+    plt.savefig(histogram_image_file)
 
 
 def compute_supervision_percentage(paths, config):
-    pass
+    """ Supervision Percentage = (B == 1).sum() / (Y == 1).sum()
+
+    Compute in rolling fashion:
+
+    while Y, B = next(train_loader):
+        def rolling(Y, B, cum, Y_):
+            cent = (B == 1).sum() / (Y == 1).sum()
+            cum *= Y_
+            cum += (B == 1).sum()  
+            cum /= (Y == 1).sum()
+    """
+    if not os.path.exists(Path("cache")):
+        os.mkdir(Path("cache"))
+
+    supervision_percentage = 0.0
+    cache_file = Path("cache", config["name"] + "_supervision_percentage")
+    if os.path.exists(cache_file):
+        with open(cache_file, 'rb') as fp:
+            supervision_percentage = pickle.load(fp)
+    else:
+        data_root = Path(paths["filtered_data_root"], config["name"])
+        train_loader, _, _ = get_coco_stuff_loaders(
+            data_root=data_root, batch_size=1)
+
+        ysum = 0
+        bsum = 0
+        for _, labels in tqdm(train_loader):
+            ysum += (labels[0].squeeze(0).numpy() == 1).sum()
+            bsum += (labels[1].squeeze(0).numpy() == 1).sum()
+
+        supervision_percentage = bsum / ysum
+        with open(Path("cache", config["name"]), 'wb') as fp:
+            pickle.dump(supervision_percentage, fp)
+
+    print(supervision_percentage)
