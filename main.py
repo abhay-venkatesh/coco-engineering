@@ -1,4 +1,4 @@
-from datasets.coco_stuff.analytics import compute_supervision_percentage
+from datasets.coco_stuff.bounding_boxes import build_coco_stuff_bb
 from pathlib import Path
 import os
 import yaml
@@ -49,4 +49,4 @@ def get_ubuntu_paths():
 if __name__ == "__main__":
     paths = get_windows_paths() if os.name == "nt" else get_ubuntu_paths()
     config = get_config("./configs/tiny_full_bb.yml")
-    compute_supervision_percentage(paths, config)
+    build_coco_stuff_bb(paths, config)
