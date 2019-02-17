@@ -3,11 +3,9 @@ from pathlib import Path
 import os
 import yaml
 
-CONFIG_FILE_PATH = "./configs/pu_agg_bb.yml"
 
-
-def get_config():
-    with open(CONFIG_FILE_PATH, 'r') as stream:
+def get_config(config_file_path):
+    with open(config_file_path, 'r') as stream:
         try:
             return yaml.load(stream)
         except yaml.YAMLError as exc:
@@ -50,5 +48,5 @@ def get_ubuntu_paths():
 
 if __name__ == "__main__":
     paths = get_windows_paths() if os.name == "nt" else get_ubuntu_paths()
-    config = get_config()
+    config = get_config("./configs/tiny_full_bb.yml")
     compute_supervision_percentage(paths, config)
