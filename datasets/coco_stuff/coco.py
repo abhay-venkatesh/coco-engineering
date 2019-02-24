@@ -21,7 +21,7 @@ def get_coco_stuff_loaders(data_root, batch_size=None):
         root=train_data_path,
         ann_file_path=os.path.join(train_data_path, "annotations.csv"))
     train_loader = DataLoader(
-        dataset=train_dataset, batch_size=batch_size, shuffle=True)
+        dataset=train_dataset, batch_size=batch_size, shuffle=False)
     val_dataset = Coco(
         root=val_data_path,
         ann_file_path=os.path.join(val_data_path, "annotations.csv"))
