@@ -48,5 +48,5 @@ def get_ubuntu_paths():
 
 if __name__ == "__main__":
     paths = get_windows_paths() if os.name == "nt" else get_ubuntu_paths()
-    config = get_config("./configs/micro_full_bb.yml")
+    config = get_config("./configs/full_bb.yml")
     build_coco_stuff_bb(paths, config)
