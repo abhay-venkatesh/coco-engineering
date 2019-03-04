@@ -1,7 +1,7 @@
 name: pu_agg_bb
 target supercategories:
 - sky
-bbox type: aggregated
+box type: aggregated
 number of boxes: 1
 splits:
 - name: train

@@ -1,7 +1,7 @@
 name: tiny_full_bb
 target supercategories:
 - sky
-bbox type: full
+box type: full
 number of boxes: 1
 splits:
 - name: train
