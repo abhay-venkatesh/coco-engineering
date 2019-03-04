@@ -12,6 +12,7 @@ import torchvision.transforms as transforms
 
 def verify_coco_stuff_weak_bb(paths, config):
     data_root = Path(paths["filtered_data_root"], config["name"])
+    print(data_root)
     train_loader, val_loader, _ = get_coco_stuff_loaders(
         data_root=data_root, batch_size=1)
 

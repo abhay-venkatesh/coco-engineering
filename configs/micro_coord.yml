@@ -1,4 +1,4 @@
-name: micro_multi
+name: micro_coord
 target supercategories:
 - building
 - structural
@@ -11,6 +11,6 @@ box type: coordinate
 number of boxes: 1
 splits:
 - name: train
-  fraction: 0.0001
+  fraction: 0.001
 - name: val
   fraction: 0.001

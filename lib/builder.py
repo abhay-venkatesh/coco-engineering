@@ -49,6 +49,7 @@ class Builder:
                         for i in range(self.n_boxes):
                             img_name = coco.loadImgs(img_id)[0]['file_name']
                             writer.writerow([img_name, i])
+                        break
 
     def _filter_dataset(self,
                         ann_file_path,
@@ -56,7 +57,8 @@ class Builder:
                         filtered_split_folder,
                         fraction=1.0):
         coco = COCO(ann_file_path)
-        box_builder = BoxBuilder(self.box_type, coco, filtered_split_folder)
+        box_builder = BoxBuilder(self.box_type, self.n_boxes, coco,
+                                 filtered_split_folder)
         img_ids = coco.getImgIds()
         img_ids = img_ids[:int(fraction * len(img_ids))]
         target_cat_ids = coco.getCatIds(supNms=self.target_supercategories)
@@ -83,10 +85,10 @@ class Builder:
                     if not os.path.exists(
                             Path(filtered_split_folder, "annotations")):
                         os.makedirs(
-                            Path(filtered_split_folder, "annotations/"))
+                            Path(filtered_split_folder, "annotations"))
                     seg.save(seg_path)
 
-                    box_builder.build(img_id, ann, self.n_boxes)
+                    box_builder.build(img_id, ann)
 
         self._filter_annotations_file(coco, filtered_split_folder, img_ids,
                                       target_cat_ids)

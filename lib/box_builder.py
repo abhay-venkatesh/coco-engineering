@@ -6,7 +6,7 @@ import random
 
 
 class BoxBuilder:
-    def __init__(self, box_type, coco, filtered_data_location):
+    def __init__(self, box_type, n_boxes, coco, filtered_data_location):
         self.box_type = box_type
         self.build = self._filter_bounding_boxes
         if self.box_type == "aggregated":
@@ -16,6 +16,8 @@ class BoxBuilder:
         elif self.box_type == "coordinate":
             self.build = self._filter_coordinate_boxes
 
+        self.n_boxes = n_boxes
+        assert self.n_boxes >= 1, ("Need to have at least one bounding box. ")
         self.coco = coco
 
         self.box_location = Path(filtered_data_location, "bbox")
@@ -105,10 +107,8 @@ class BoxBuilder:
 
     def _filter_bounding_boxes(self, img_id, ann, n_boxes=10):
         seg_array = self.coco.annToMask(ann)
-        assert n_boxes >= 1, (
-            "Need to have at least one sample for creating bounding boxes. ")
 
-        for i in range(n_boxes):
+        for i in range(self.n_boxes):
             bbox = self._draw_random_bbox_from_seg(img_id, seg_array)
             bbox = Image.fromarray(bbox).convert("L")
             bbox_name = self.coco.loadImgs(img_id)[0]['file_name'].replace(
@@ -116,14 +116,10 @@ class BoxBuilder:
             bbox_path = Path(self.box_location, bbox_name)
             bbox.save(bbox_path)
 
-    def _filter_agg_bounding_boxes(self, img_id, ann, n_boxes=10):
+    def _filter_agg_bounding_boxes(self, img_id, ann):
         seg_array = self.coco.annToMask(ann)
-
-        # Filters, and aggregates bounding boxes into a single mask
-        assert n_boxes >= 1, ("Need to have at least one bounding box. ")
-
         bbox = self._draw_random_bbox_from_seg(img_id, seg_array)
-        for i in range(1, n_boxes):
+        for i in range(1, self.n_boxes):
             bbox_ = bbox | self._draw_random_bbox_from_seg(img_id, seg_array)
             bbox = bbox_
 
@@ -134,7 +130,7 @@ class BoxBuilder:
         bbox_path = Path(self.box_location, bbox_name)
         bbox.save(bbox_path)
 
-    def _filter_full_bounding_boxes(self, img_id, ann, n_boxes=1):
+    def _filter_full_bounding_boxes(self, img_id, ann):
         img_height = self.coco.loadImgs(img_id)[0]['height']
         img_width = self.coco.loadImgs(img_id)[0]['width']
         seg = Image.fromarray(np.zeros((img_height, img_width)))
@@ -149,6 +145,33 @@ class BoxBuilder:
         bbox_path = Path(self.box_location, bbox_name)
         bbox.save(bbox_path)
 
-    def _filter_coordinate_boxes(self, img_id, ann, n_boxes=1):
-        raise NotImplementedError
+    def _filter_coordinate_boxes(self, img_id, ann):
+        try:
+            if self.img_id == img_id:
+                self.coord_box = np.vstack(
+                    [self.coord_box, np.asarray(ann["bbox"])])
+            else:
+                bbox = np.asarray(self.coord_box, dtype=np.uint8)
+                bbox = Image.fromarray(bbox).convert("L")
+                bbox_name = self.coco.loadImgs(
+                    self.img_id)[0]['file_name'].replace(".jpg", "-0.png")
+                bbox_path = Path(self.box_location, bbox_name)
+                bbox.save(bbox_path)
 
+                self.img_id = img_id
+                self.coord_box = [0, 0, 0, 0]
+                self.coord_box = np.vstack(
+                    [self.coord_box, np.asarray(ann["bbox"])])
+        except AttributeError:
+            self.img_id = img_id
+            self.coord_box = [0, 0, 0, 0]
+            self.coord_box = np.asarray(ann["bbox"])
+
+    def __del__(self):
+        if self.box_type == "coordinate":
+            bbox = np.asarray(self.coord_box, dtype=np.uint8)
+            bbox = Image.fromarray(bbox).convert("L")
+            bbox_name = self.coco.loadImgs(
+                self.img_id)[0]['file_name'].replace(".jpg", "-0.png")
+            bbox_path = Path(self.box_location, bbox_name)
+            bbox.save(bbox_path)
