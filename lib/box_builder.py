@@ -13,6 +13,8 @@ class BoxBuilder:
             self.build = self._filter_agg_bounding_boxes
         elif self.box_type == "full":
             self.build = self._filter_full_bounding_boxes
+        elif self.box_type == "coordinate":
+            self.build = self._filter_coordinate_boxes
 
         self.coco = coco
 
@@ -146,3 +148,7 @@ class BoxBuilder:
             ".jpg", "-0.png")
         bbox_path = Path(self.box_location, bbox_name)
         bbox.save(bbox_path)
+
+    def _filter_coordinate_boxes(self, img_id, ann, n_boxes=1):
+        raise NotImplementedError
+

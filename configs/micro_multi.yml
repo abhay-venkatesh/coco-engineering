@@ -1,0 +1,16 @@
+name: micro_multi
+target supercategories:
+- building
+- structural
+- plant
+- sky
+- solid
+- ground
+- water
+box type: coordinate
+number of boxes: 1
+splits:
+- name: train
+  fraction: 0.0001
+- name: val
+  fraction: 0.001
