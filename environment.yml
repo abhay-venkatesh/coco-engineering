@@ -1,0 +1,11 @@
+name: data-engineering
+channels:
+- conda-forge
+- defaults
+dependencies:
+- python=3.6
+- yaml
+- pytorch
+- numpy
+- torchvision
+- scipy

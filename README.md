@@ -30,3 +30,7 @@ datasets/
     ...
 main.py
 ```
+
+## Usage
+
+Add paths into the lib/coco/paths.py file.
