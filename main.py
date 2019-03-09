@@ -1,7 +1,6 @@
 from lib.configure import get_config
 import argparse
 import importlib
-import yaml
 
 
 def get_args():

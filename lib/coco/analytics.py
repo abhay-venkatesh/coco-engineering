@@ -1,5 +1,5 @@
 from PIL import Image
-from lib.coco import get_coco_stuff_loaders
+from lib.coco.coco import get_coco_stuff_loaders
 from pathlib import Path
 from scipy.stats import norm
 from tqdm import tqdm

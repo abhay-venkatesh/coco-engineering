@@ -1,5 +1,6 @@
 from PIL import Image
-from lib.box_builder import BoxBuilder
+from lib.coco.box_builder import BoxBuilder
+from lib.coco.paths import get_paths
 from pathlib import Path
 from pycocotools.coco import COCO
 from tqdm import tqdm
@@ -9,8 +10,8 @@ import shutil
 
 
 class Builder:
-    def __init__(self, paths, config):
-        self.paths = paths
+    def __init__(self, config):
+        self.paths = get_paths()
         self.config = config
 
         if not os.path.exists(self.paths["filtered_data_root"]):
