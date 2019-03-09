@@ -1,7 +1,7 @@
-from lib.paths import get_paths
+from lib.configure import get_config
 import argparse
-import yaml
 import importlib
+import yaml
 
 
 def get_args():
@@ -12,20 +12,11 @@ def get_args():
     return args
 
 
-def get_config(config_file_path):
-    with open(config_file_path, 'r') as stream:
-        try:
-            return yaml.load(stream)
-        except yaml.YAMLError as exc:
-            print(exc)
-
-
 if __name__ == "__main__":
-    paths = get_paths()
     args = get_args()
     config = get_config(args.config_file)
     if args.mode == "build":
-        importlib.import_module("lib.builder").Builder(paths, config).build()
+        importlib.import_module("lib." + config["dataset"] +
+                                ".builder").Builder(config).build()
     elif args.mode == "verify":
-        importlib.import_module("lib.analytics").verify_coco_stuff_weak_bb(
-            paths, config)
+        raise NotImplementedError
