@@ -85,8 +85,7 @@ class Builder:
                                     seg_name)
                     if not os.path.exists(
                             Path(filtered_split_folder, "annotations")):
-                        os.makedirs(
-                            Path(filtered_split_folder, "annotations"))
+                        os.makedirs(Path(filtered_split_folder, "annotations"))
                     seg.save(seg_path)
 
                     box_builder.build(img_id, ann)
