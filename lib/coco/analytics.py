@@ -8,54 +8,56 @@ import matplotlib.pyplot as plt
 import os
 import pickle
 import random
+import shutil
 import torchvision.transforms as transforms
+import numpy as np
 
 
-def verify_coco_stuff_weak_bb(config):
+def verify_images(config):
     paths = get_paths()
     data_root = Path(paths["filtered_data_root"], config["name"])
-    print(data_root)
+
+    if not os.path.exists(Path("examples")):
+        os.mkdir(Path("examples"))
+
+    example_path = Path("examples", config["name"])
+    if os.path.exists(example_path):
+        shutil.rmtree(example_path)
+    os.makedirs(example_path)
+
     train_loader, val_loader, _ = get_coco_stuff_loaders(
         data_root=data_root, batch_size=1)
 
-    for image, labels in train_loader:
-        img_tensor = image.squeeze(0)
-        img = transforms.ToPILImage()(img_tensor)
-        img.show()
-        input("Press Enter to continue...")
+    ri = random.randint(0, len(train_loader))
+    for i, (image, labels) in enumerate(train_loader):
+        if i == ri:
+            img_tensor = image.squeeze(0)
+            img = transforms.ToPILImage()(img_tensor)
+            img.save(Path(example_path, "img-" + str(i) + ".png"))
 
-        mask_array = labels[0].squeeze(0).numpy()
-        mask_array *= 100
-        mask = Image.fromarray(mask_array)
-        mask.show()
-        input("Press Enter to continue...")
+            mask_array = labels[0].squeeze(0).numpy()
+            mask = Image.fromarray(np.uint8(mask_array * 100), 'L')
+            mask.save(Path(example_path, "mask-" + str(i) + ".png"))
 
-        bbox_array = labels[1].squeeze(0).numpy()
-        bbox_array *= 100
-        bbox = Image.fromarray(bbox_array)
-        bbox.show()
-        input("Press Enter to continue...")
-        break
+            bbox_array = labels[1].squeeze(0).numpy()
+            bbox = Image.fromarray(np.uint8(bbox_array * 100), 'L')
+            bbox.save(Path(example_path, "bbox-" + str(i) + ".png"))
+            break
 
     ri = random.randint(0, len(val_loader))
     for i, (image, labels) in enumerate(val_loader):
         if i == ri:
             img_tensor = image.squeeze(0)
             img = transforms.ToPILImage()(img_tensor)
-            img.show()
-            input("Press Enter to continue...")
+            img.save(Path(example_path, "img-" + str(i) + ".png"))
 
             mask_array = labels[0].squeeze(0).numpy()
-            mask_array *= 100
-            mask = Image.fromarray(mask_array)
-            mask.show()
-            input("Press Enter to continue...")
+            mask = Image.fromarray(np.uint8(mask_array * 100), 'L')
+            mask.save(Path(example_path, "mask-" + str(i) + ".png"))
 
             bbox_array = labels[1].squeeze(0).numpy()
-            bbox_array *= 100
-            bbox = Image.fromarray(bbox_array)
-            bbox.show()
-            input("Press Enter to continue...")
+            bbox = Image.fromarray(np.uint8(bbox_array * 100), 'L')
+            bbox.save(Path(example_path, "bbox-" + str(i) + ".png"))
             break
 
 

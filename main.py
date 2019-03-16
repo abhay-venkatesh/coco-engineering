@@ -23,4 +23,4 @@ if __name__ == "__main__":
 
         analytics = importlib.import_module("lib." + config["dataset"] +
                                             ".analytics")
-        analytics.verify_coco_stuff_weak_bb(config)
+        analytics.verify_images(config)
