@@ -18,4 +18,9 @@ if __name__ == "__main__":
         importlib.import_module("lib." + config["dataset"] +
                                 ".builder").Builder(config).build()
     elif args.mode == "verify":
-        raise NotImplementedError
+        if config["dataset"] != "coco":
+            raise NotImplementedError
+
+        analytics = importlib.import_module("lib." + config["dataset"] +
+                                            ".analytics")
+        analytics.verify_coco_stuff_weak_bb(config)

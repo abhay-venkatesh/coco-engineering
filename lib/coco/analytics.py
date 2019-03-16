@@ -1,5 +1,6 @@
 from PIL import Image
 from lib.coco.coco import get_coco_stuff_loaders
+from lib.coco.paths import get_paths
 from pathlib import Path
 from scipy.stats import norm
 from tqdm import tqdm
@@ -10,7 +11,8 @@ import random
 import torchvision.transforms as transforms
 
 
-def verify_coco_stuff_weak_bb(paths, config):
+def verify_coco_stuff_weak_bb(config):
+    paths = get_paths()
     data_root = Path(paths["filtered_data_root"], config["name"])
     print(data_root)
     train_loader, val_loader, _ = get_coco_stuff_loaders(
