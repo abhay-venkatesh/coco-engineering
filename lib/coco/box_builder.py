@@ -9,15 +9,15 @@ class BoxBuilder:
     def __init__(self, box_type, n_boxes, coco, filtered_data_location):
         self.box_type = box_type
         self.build = self._filter_bounding_boxes
-        if self.box_type == "aggregated":
-            self.build = self._filter_agg_bounding_boxes
-        elif self.box_type == "full":
+        if self.box_type == "full":
             self.build = self._filter_full_bounding_boxes
         elif self.box_type == "coordinate":
             self.build = self._filter_coordinate_boxes
         elif type(self.box_type) is dict:
             if self.box_type["name"] == "nonrandom aggregated":
                 self.build = self._filted_nonrandom_agg_boxes
+            elif self.box_type["name"] == "aggregated":
+                self.build = self._filter_agg_bounding_boxes
             else:
                 raise NotImplementedError(
                     "Box type: " + self.box_type["name"] + " not supported.")
@@ -128,7 +128,7 @@ class BoxBuilder:
     def _filter_agg_bounding_boxes(self, img_id, ann):
         seg_array = self.coco.annToMask(ann)
         bbox = self._draw_random_bbox_from_seg(img_id, seg_array)
-        for i in range(1, self.n_boxes):
+        for i in range(1, self.box_type["num miniboxes"]):
             bbox_ = bbox | self._draw_random_bbox_from_seg(img_id, seg_array)
             bbox = bbox_
 
@@ -223,10 +223,11 @@ class BoxBuilder:
         np_seg = np.asarray(seg, dtype=int)
         return np_seg
 
-    def _filted_nonrandom_agg_boxes(self, img_id, ann, box_ratio=0.5):
+    def _filted_nonrandom_agg_boxes(self, img_id, ann):
         seg_array = self.coco.annToMask(ann)
+        box_ratio = self.box_type["box ratio"]
         bbox = self._draw_bbox_from_seg(img_id, seg_array, box_ratio)
-        for i in range(1, self.n_boxes):
+        for i in range(1, self.box_type["num miniboxes"]):
             bbox_ = bbox | self._draw_bbox_from_seg(img_id, seg_array,
                                                     box_ratio)
             bbox = bbox_
