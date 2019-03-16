@@ -2,6 +2,7 @@ from PIL import Image
 from lib.coco.box_builder import BoxBuilder
 from lib.coco.paths import get_paths
 from pathlib import Path
+from lib.builder_base import BuilderBase
 from pycocotools.coco import COCO
 from tqdm import tqdm
 import csv
@@ -9,7 +10,7 @@ import os
 import shutil
 
 
-class Builder:
+class Builder(BuilderBase):
     def __init__(self, config):
         self.paths = get_paths()
         self.config = config

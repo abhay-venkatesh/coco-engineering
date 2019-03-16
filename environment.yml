@@ -9,3 +9,4 @@ dependencies:
 - numpy
 - torchvision
 - scipy
+- wget
