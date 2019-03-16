@@ -5,12 +5,12 @@ from pathlib import Path
 from scipy.stats import norm
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import pickle
 import random
 import shutil
 import torchvision.transforms as transforms
-import numpy as np
 
 
 def verify_images(config):
