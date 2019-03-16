@@ -2,11 +2,13 @@ name: data-engineering
 channels:
 - conda-forge
 - defaults
+- hcc
 dependencies:
 - python=3.6
-- yaml
+- pyyaml
 - pytorch
 - numpy
 - torchvision
 - scipy
-- wget
+- pycocotools
+- tqdm
