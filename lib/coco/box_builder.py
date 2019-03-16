@@ -18,6 +18,8 @@ class BoxBuilder:
                 self.build = self._filted_nonrandom_agg_boxes
             elif self.box_type["name"] == "aggregated":
                 self.build = self._filter_agg_bounding_boxes
+            elif self.box_type["name"] == "turnedoff":
+                self.build = self._filter_turnedoff_mask
             else:
                 raise NotImplementedError(
                     "Box type: " + self.box_type["name"] + " not supported.")
@@ -238,6 +240,24 @@ class BoxBuilder:
             ".jpg", "-0.png")
         bbox_path = Path(self.box_location, bbox_name)
         bbox.save(bbox_path)
+
+    def _turn_mask_pixels_off(self, seg_array, ratio):
+        rows, cols = np.where(seg_array == 1)
+        rows = rows[:round(len(rows) * ratio)]
+        cols = cols[:round(len(cols) * ratio)]
+        seg_array[rows, cols] = 0
+        return seg_array
+
+    def _filter_turnedoff_mask(self, img_id, ann):
+        seg_array = self.coco.annToMask(ann)
+        ratio = self.box_type["ratio"]
+        mask = self._turn_mask_pixels_off(seg_array, ratio)
+        mask = np.array(mask, dtype=np.uint8)
+        mask = Image.fromarray(mask).convert("L")
+        mask_name = self.coco.loadImgs(img_id)[0]['file_name'].replace(
+            ".jpg", "-0.png")
+        mask_path = Path(self.box_location, mask_name)
+        mask.save(mask_path)
 
     def __del__(self):
         if self.box_type == "coordinate":
