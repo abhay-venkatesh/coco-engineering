@@ -3,9 +3,9 @@ target supercategories:
 - sky
 box type: 
   name: nonrandom aggregated
-  ratio: 0.5
-  num_miniboxes: 10
-number of boxes: 10
+  box ratio: 0.5
+  num miniboxes: 10
+number of boxes: 1
 splits:
 - name: train
   fraction: 0.001
