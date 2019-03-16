@@ -176,9 +176,67 @@ class BoxBuilder:
             self.coord_box = [0, 0, 0, 0]
             self.coord_box = np.asarray(ann["bbox"])
 
+    def _fixed_ratio_bbox(self, seg_array, box_ratio):
+        """ For example, let
+        seg_array = [
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+        xb, yb, wb, hb = 0, 0, 5, 2 """
+        _, _, wb, hb = self._get_seg_boundary(seg_array)
+        rows, cols = np.nonzero(seg_array)
+        ri = random.randint(0, len(rows) - 1)
+        """ Then,
+        y in [0, 1]
+        x in [0, 1, 2, 3, 4] """
+        y, x = rows[ri], cols[ri]
+        """ We want
+        h in [0, hb - y]
+        w in [0, wb - x] """
+        h, w = round((hb - y) * box_ratio), round((wb - x) * box_ratio)
+        return x, y, w, h
+
+    def _draw_bbox_from_seg(self, img_id, seg_array, box_ratio):
+        img_height = self.coco.loadImgs(img_id)[0]['height']
+        img_width = self.coco.loadImgs(img_id)[0]['width']
+        seg = Image.fromarray(np.zeros((img_height, img_width)))
+        draw = ImageDraw.Draw(seg)
+        x, y, w, h = self._fixed_ratio_bbox(seg_array, box_ratio)
+        """
+        img = [
+            [1, 1, 1],
+            [0, 0, 0],
+            [1, 1, 1],
+        ]
+
+        then (x, y) indexes of each element are given by [
+            [(0, 0), (0, 1), (0, 2)],
+            [(1, 0), (1, 1), (1, 2)],
+            [(2, 0), (2, 1), (2, 2)],
+        ]
+        """
+        rect = self._get_rect(x, y, w, h, 0)
+        draw.polygon([tuple(p) for p in rect], fill=1)
+        np_seg = np.asarray(seg, dtype=int)
+        return np_seg
+
     def _filted_nonrandom_agg_boxes(self, img_id, ann, box_ratio=0.5):
-        raise NotImplementedError(
-            "Nonrandom aggregated boxes not implemented.")
+        seg_array = self.coco.annToMask(ann)
+        bbox = self._draw_bbox_from_seg(img_id, seg_array, box_ratio)
+        for i in range(1, self.n_boxes):
+            bbox_ = bbox | self._draw_bbox_from_seg(img_id, seg_array,
+                                                    box_ratio)
+            bbox = bbox_
+
+        bbox = np.array(bbox, dtype=np.uint8)
+        bbox = Image.fromarray(bbox).convert("L")
+        bbox_name = self.coco.loadImgs(img_id)[0]['file_name'].replace(
+            ".jpg", "-0.png")
+        bbox_path = Path(self.box_location, bbox_name)
+        bbox.save(bbox_path)
 
     def __del__(self):
         if self.box_type == "coordinate":
