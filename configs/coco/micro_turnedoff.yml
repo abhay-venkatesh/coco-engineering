@@ -1,0 +1,12 @@
+name: micro_turnedoff
+target supercategories:
+- sky
+box type: 
+  name: turnedoff 
+  ratio: 0.5
+number of boxes: 1
+splits:
+- name: train
+  fraction: 0.001
+- name: val
+  fraction: 0.01
