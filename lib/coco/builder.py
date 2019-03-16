@@ -30,7 +30,6 @@ class Builder(BuilderBase):
                 os.mkdir(filtered_split_folder)
 
         self.target_supercategories = config["target supercategories"]
-        self.box_type = config["box type"]
         self.n_boxes = config["number of boxes"]
 
     def _filter_annotations_file(self, coco, filtered_split_folder, img_ids,
@@ -59,7 +58,7 @@ class Builder(BuilderBase):
                         filtered_split_folder,
                         fraction=1.0):
         coco = COCO(ann_file_path)
-        box_builder = BoxBuilder(self.box_type, self.n_boxes, coco,
+        box_builder = BoxBuilder(self.config["box type"], self.n_boxes, coco,
                                  filtered_split_folder)
         img_ids = coco.getImgIds()
         img_ids = img_ids[:int(fraction * len(img_ids))]

@@ -15,6 +15,15 @@ class BoxBuilder:
             self.build = self._filter_full_bounding_boxes
         elif self.box_type == "coordinate":
             self.build = self._filter_coordinate_boxes
+        elif type(self.box_type) is dict:
+            if self.box_type["name"] == "nonrandom aggregated":
+                self.build = self._filted_nonrandom_agg_boxes
+            else:
+                raise NotImplementedError(
+                    "Box type: " + self.box_type["name"] + " not supported.")
+        else:
+            raise NotImplementedError("Box type: " + self.box_type +
+                                      " not supported.")
 
         self.n_boxes = n_boxes
         assert self.n_boxes >= 1, ("Need to have at least one bounding box. ")
@@ -166,6 +175,10 @@ class BoxBuilder:
             self.img_id = img_id
             self.coord_box = [0, 0, 0, 0]
             self.coord_box = np.asarray(ann["bbox"])
+
+    def _filted_nonrandom_agg_boxes(self, img_id, ann, box_ratio=0.5):
+        raise NotImplementedError(
+            "Nonrandom aggregated boxes not implemented.")
 
     def __del__(self):
         if self.box_type == "coordinate":
