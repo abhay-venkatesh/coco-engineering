@@ -77,7 +77,8 @@ def get_paths():
         return get_leibniz_paths()
     elif platform.node() == "tesla":
         return get_tesla_paths()
-    elif platform.node() == "ip-172-31-3-97":
+    elif (platform.node() == "ip-172-31-8-21"
+          or platform.node() == "ip-172-31-3-97"):
         return get_aws_paths()
     else:
         raise ValueError("Platform not supported")
