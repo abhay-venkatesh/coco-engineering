@@ -12,3 +12,4 @@ dependencies:
 - scipy
 - pycocotools
 - tqdm
+- scikit-image
