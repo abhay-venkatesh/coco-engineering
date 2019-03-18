@@ -24,3 +24,13 @@ if __name__ == "__main__":
         analytics = importlib.import_module("lib." + config["dataset"] +
                                             ".analytics")
         analytics.verify_images(config)
+    elif args.mode == "histogram":
+        if config["dataset"] != "coco":
+            raise NotImplementedError
+
+        importlib.import_module("lib." + config["dataset"] +
+                                ".analytics").Analyzer(
+                                    config).compute_label_fraction_histogram()
+
+    else:
+        raise NotImplementedError("Mode: " + args.mode + " not supported.")
