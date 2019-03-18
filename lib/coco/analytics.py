@@ -162,7 +162,7 @@ class Analyzer:
             os.mkdir(Path("stats"))
 
         histogram_image_file = Path(
-            "stats", self.config["name"] + "_noise_histogram.png")
+            "stats", self.config["name"] + "_label_frac_histogram.png")
         plt.savefig(histogram_image_file)
 
 
