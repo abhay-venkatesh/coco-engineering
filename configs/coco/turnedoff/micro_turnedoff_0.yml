@@ -1,4 +1,4 @@
-name: turnedoff_0
+name: micro_turnedoff_0
 target supercategories:
 - sky
 box type: 
@@ -7,6 +7,6 @@ box type:
 number of boxes: 1
 splits:
 - name: train
-  fraction: 1
+  fraction: 0.001
 - name: val
-  fraction: 1
+  fraction: 0.01
