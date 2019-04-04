@@ -10,3 +10,4 @@ splits:
   fraction: 0.001
 - name: val
   fraction: 0.01
+downsample: 2

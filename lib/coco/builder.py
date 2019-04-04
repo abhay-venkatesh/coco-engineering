@@ -1,8 +1,9 @@
 from PIL import Image
+from lib.builder_base import BuilderBase
 from lib.coco.box_builder import BoxBuilder
 from lib.coco.paths import get_paths
+from math import sqrt
 from pathlib import Path
-from lib.builder_base import BuilderBase
 from pycocotools.coco import COCO
 from tqdm import tqdm
 import csv
@@ -32,6 +33,11 @@ class Builder(BuilderBase):
         self.target_supercategories = config["target supercategories"]
         self.n_boxes = config["number of boxes"]
 
+        try:
+            self.downsample = config["downsample"]
+        except KeyError:
+            self.downsample = 1
+
     def _filter_annotations_file(self, coco, filtered_split_folder, img_ids,
                                  target_cat_ids):
         filtered_ann_path = Path(filtered_split_folder, "annotations.csv")
@@ -59,7 +65,7 @@ class Builder(BuilderBase):
                         fraction=1.0):
         coco = COCO(ann_file_path)
         box_builder = BoxBuilder(self.config["box type"], self.n_boxes, coco,
-                                 filtered_split_folder)
+                                 filtered_split_folder, self.downsample)
         img_ids = coco.getImgIds()
         img_ids = img_ids[:int(fraction * len(img_ids))]
         target_cat_ids = coco.getCatIds(supNms=self.target_supercategories)
@@ -75,7 +81,13 @@ class Builder(BuilderBase):
                     if not os.path.exists(
                             Path(filtered_split_folder, "images")):
                         os.makedirs(Path(filtered_split_folder, "images"))
-                    shutil.copyfile(img_path, img_path_)
+
+                    img = Image.open(img_path)
+                    width, height = img.size
+                    width = round(width / sqrt(self.downsample))
+                    height = round(height / sqrt(self.downsample))
+                    img = img.resize((width, height), Image.ANTIALIAS)
+                    img.save(img_path_)
 
                     seg_array = coco.annToMask(ann)
                     seg = Image.fromarray(seg_array)
@@ -86,6 +98,11 @@ class Builder(BuilderBase):
                     if not os.path.exists(
                             Path(filtered_split_folder, "annotations")):
                         os.makedirs(Path(filtered_split_folder, "annotations"))
+
+                    width, height = seg.size
+                    width = round(width / sqrt(self.downsample))
+                    height = round(height / sqrt(self.downsample))
+                    seg = seg.resize((width, height), Image.ANTIALIAS)
                     seg.save(seg_path)
 
                     box_builder.build(img_id, ann)

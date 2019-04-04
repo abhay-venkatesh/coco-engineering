@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw
+from math import sqrt
 from pathlib import Path
 import numpy as np
 import os
@@ -6,7 +7,8 @@ import random
 
 
 class BoxBuilder:
-    def __init__(self, box_type, n_boxes, coco, filtered_data_location):
+    def __init__(self, box_type, n_boxes, coco, filtered_data_location,
+                 downsample):
         self.box_type = box_type
         self.build = self._filter_bounding_boxes
         if self.box_type == "full":
@@ -34,6 +36,8 @@ class BoxBuilder:
         self.box_location = Path(filtered_data_location, "bbox")
         if not os.path.exists(self.box_location):
             os.makedirs(self.box_location)
+
+        self.downsample = downsample
 
     def _random_bbox(self, seg_array, smoothing=2):
         """ For example, let
@@ -254,6 +258,12 @@ class BoxBuilder:
         mask = self._turn_mask_pixels_off(seg_array, ratio)
         mask = np.array(mask, dtype=np.uint8)
         mask = Image.fromarray(mask).convert("L")
+
+        width, height = mask.size
+        width = round(width / sqrt(self.downsample))
+        height = round(height / sqrt(self.downsample))
+        mask = mask.resize((width, height), Image.ANTIALIAS)
+
         mask_name = self.coco.loadImgs(img_id)[0]['file_name'].replace(
             ".jpg", "-0.png")
         mask_path = Path(self.box_location, mask_name)
