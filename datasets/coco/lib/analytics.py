@@ -17,14 +17,11 @@ def verify_images(config):
     paths = get_paths()
     data_root = Path(paths["filtered_data_root"], config["name"])
 
-    if not os.path.exists(Path("datasets", config["dataset"], "examples")):
-        os.mkdir(Path("datasets", config["dataset"], "examples"))
-
     example_path = Path("datasets", config["dataset"], "examples",
                         config["name"])
     if os.path.exists(example_path):
         shutil.rmtree(example_path)
-    os.mkdir(example_path)
+    os.makedirs(example_path)
 
     train_loader, val_loader, _ = get_coco_stuff_loaders(
         data_root=data_root, batch_size=1)
