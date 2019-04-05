@@ -1,6 +1,6 @@
 from PIL import Image
-from lib.coco.coco import get_coco_stuff_loaders
-from lib.coco.paths import get_paths
+from datasets.coco.lib.coco import get_coco_stuff_loaders
+from datasets.coco.lib.paths import get_paths
 from pathlib import Path
 from scipy.stats import norm
 from tqdm import tqdm
@@ -20,7 +20,8 @@ def verify_images(config):
     if not os.path.exists(Path("examples")):
         os.mkdir(Path("examples"))
 
-    example_path = Path("examples", config["name"])
+    example_path = Path("datasets", config["dataset"], "examples",
+                        config["name"])
     if os.path.exists(example_path):
         shutil.rmtree(example_path)
     os.mkdir(example_path)
