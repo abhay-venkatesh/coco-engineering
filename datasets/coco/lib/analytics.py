@@ -17,8 +17,8 @@ def verify_images(config):
     paths = get_paths()
     data_root = Path(paths["filtered_data_root"], config["name"])
 
-    if not os.path.exists(Path("examples")):
-        os.mkdir(Path("examples"))
+    if not os.path.exists(Path("datasets", config["dataset"], "examples")):
+        os.mkdir(Path("datasets", config["dataset"], "examples"))
 
     example_path = Path("datasets", config["dataset"], "examples",
                         config["name"])
