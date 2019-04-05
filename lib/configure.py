@@ -1,7 +1,7 @@
 import yaml
 
 
-def get_config(config_file_path):
+def configure(config_file_path):
     with open(config_file_path, 'r') as stream:
         try:
             return set_defaults(yaml.load(stream))

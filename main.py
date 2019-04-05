@@ -1,4 +1,4 @@
-from lib.configure import get_config
+from lib.configure import configure
 import argparse
 import importlib  # noqa F401
 
@@ -11,11 +11,15 @@ def get_args():
     return args
 
 
+def execute(mode):
+    if mode in ["build", "verify", "histogram"]:
+        exec("importlib.import_module(\"lib.{mode}\").{mode}(config)".format(
+            mode=mode))
+    else:
+        raise NotImplementedError("Mode: " + mode + " not supported.")
+
+
 if __name__ == "__main__":
     args = get_args()
-    config = get_config(args.config_file)
-    if args.mode in ["build", "verify", "histogram"]:
-        exec("importlib.import_module(\"lib.{mode}\").{mode}(config)".format(
-            mode=args.mode))
-    else:
-        raise NotImplementedError("Mode: " + args.mode + " not supported.")
+    config = configure(args.config_file)
+    execute(args.mode)
