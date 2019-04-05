@@ -16,13 +16,13 @@ class Builder:
         self.config = config
 
         if not os.path.exists(self.paths["filtered_data_root"]):
-            os.makedirs(self.paths["filtered_data_root"])
+            os.mkdir(self.paths["filtered_data_root"])
 
         self.dataset_root = Path(self.paths["filtered_data_root"],
                                  self.config["name"])
         if os.path.exists(self.dataset_root):
             shutil.rmtree(self.dataset_root)
-        os.makedirs(self.dataset_root)
+        os.mkdir(self.dataset_root)
 
         for split in self.config["splits"]:
             filtered_split_folder = Path(self.dataset_root, split["name"])
@@ -79,7 +79,7 @@ class Builder:
                     img_path_ = Path(filtered_split_folder, "images", img_name)
                     if not os.path.exists(
                             Path(filtered_split_folder, "images")):
-                        os.makedirs(Path(filtered_split_folder, "images"))
+                        os.mkdir(Path(filtered_split_folder, "images"))
 
                     img = Image.open(img_path)
                     width, height = img.size
@@ -96,7 +96,7 @@ class Builder:
                                     seg_name)
                     if not os.path.exists(
                             Path(filtered_split_folder, "annotations")):
-                        os.makedirs(Path(filtered_split_folder, "annotations"))
+                        os.mkdir(Path(filtered_split_folder, "annotations"))
 
                     width, height = seg.size
                     width = round(width / sqrt(self.downsample))

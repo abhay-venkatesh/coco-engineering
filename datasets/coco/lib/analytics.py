@@ -23,7 +23,7 @@ def verify_images(config):
     example_path = Path("examples", config["name"])
     if os.path.exists(example_path):
         shutil.rmtree(example_path)
-    os.makedirs(example_path)
+    os.mkdir(example_path)
 
     train_loader, val_loader, _ = get_coco_stuff_loaders(
         data_root=data_root, batch_size=1)

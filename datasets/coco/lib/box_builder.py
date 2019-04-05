@@ -35,7 +35,7 @@ class BoxBuilder:
 
         self.box_location = Path(filtered_data_location, "bbox")
         if not os.path.exists(self.box_location):
-            os.makedirs(self.box_location)
+            os.mkdir(self.box_location)
 
         self.downsample = downsample
 
