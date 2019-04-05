@@ -12,9 +12,11 @@ def get_args():
 
 
 def execute(mode):
-    if mode in ["build", "verify", "histogram"]:
+    if mode in ["build", "verify"]:
         exec("importlib.import_module(\"lib.{mode}\").{mode}(config)".format(
             mode=mode))
+    elif mode in ["histogram"]:
+        importlib.import_module("lib.analyze").analyze(config, mode)
     else:
         raise NotImplementedError("Mode: " + mode + " not supported.")
 

@@ -1,7 +1,6 @@
 from PIL import Image
-from lib.builder_base import BuilderBase
-from lib.coco.box_builder import BoxBuilder
-from lib.coco.paths import get_paths
+from datasets.coco.lib.box_builder import BoxBuilder
+from datasets.coco.lib.paths import get_paths
 from math import sqrt
 from pathlib import Path
 from pycocotools.coco import COCO
@@ -11,7 +10,7 @@ import os
 import shutil
 
 
-class Builder(BuilderBase):
+class Builder:
     def __init__(self, config):
         self.paths = get_paths()
         self.config = config

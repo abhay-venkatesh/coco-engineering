@@ -1,2 +1,9 @@
+import importlib
+
+
 def build(config):
-    raise NotImplementedError
+    if config["dataset"] in ["coco"]:
+        module_name = "datasets." + config["dataset"] + ".lib.builder"
+        importlib.import_module(module_name).Builder(config).build()
+    else:
+        raise NotImplementedError
