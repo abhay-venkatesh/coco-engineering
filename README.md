@@ -1,6 +1,6 @@
-# coco-engineering
+# coco-stuff-tools
 
-Engineering the MS COCO dataset.
+Engineering the MS COCO Stuff dataset.
 
 ## Setup
 
