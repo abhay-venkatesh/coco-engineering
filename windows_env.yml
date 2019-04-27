@@ -1,7 +1,6 @@
 name: coco-engineering
-channels:
-- defaults
-- hcc
 dependencies:
+- python=3.7.3
 - numpy
-- pycocotools
+- pyyaml
+- inflection
