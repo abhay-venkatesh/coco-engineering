@@ -5,22 +5,21 @@ import os
 
 
 class COCOStuffBuilder:
-    def build(self, split, config):
+    def __init__(self, config):
+        annotations_path = Path(config["source"], "annotations",
+                                "stuff_" + self.SPLIT + "2017.json")
+        self.coco = COCO(annotations_path)
+
+    def build(self, config):
         raise NotImplementedError
 
-        if split not in ["train", "val"]:
-            raise ValueError("Split " + split + " not supported.")
-
         # Load image ids
-        annotations_path = Path(config["source"], "annotations",
-                                "stuff_" + split + "2017.json")
-        coco = COCO(annotations_path)
-        cat_ids = coco.getCatIds(supNms=config["supercategories"])
-        img_ids = coco.getImgIds(catIds=cat_ids)
+        cat_ids = self.coco.getCatIds(supNms=config["supercategories"])
+        img_ids = self.coco.getImgIds(catIds=cat_ids)
         img_ids = img_ids[:len(img_ids) * config["size fraction"]]
 
         # Setup paths
-        split_path = Path(config["destination"], split)
+        split_path = Path(config["destination"], self.SPLIT)
         image_path = Path(split_path, "images")
         if not os.path.exists(image_path):
             os.mkdir(image_path)
@@ -30,9 +29,17 @@ class COCOStuffBuilder:
             os.mkdir(image_path)
 
         # Build the dataset
-        print("Building " + split + " split...")
+        print("Building " + self.SPLIT + " split...")
         for img_id in tqdm(img_ids):
             pass
 
     def _build_image(self, img_id, image_path):
         raise NotImplementedError
+
+
+class COCOStuffValBuilder(COCOStuffBuilder):
+    SPLIT = "val"
+
+
+class COCOStuffTrainBuilder(COCOStuffBuilder):
+    SPLIT = "train"
