@@ -1,3 +1,3 @@
-# data-engineering
+# coco-engineering
 
-Engineering data for machine learning. 
+Engineering the MS COCO dataset.
