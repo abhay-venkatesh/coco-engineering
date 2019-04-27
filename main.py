@@ -16,4 +16,4 @@ if __name__ == "__main__":
     agent_module = importlib.import_module(("lib.agents.{}").format(
         inflection.underscore(config["agent"])))
     Agent = getattr(agent_module, config["agent"])
-    Agent(config).run()
+    Agent().run(config)

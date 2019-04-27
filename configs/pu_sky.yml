@@ -1,6 +1,10 @@
-agent: BinaryPUAgent
+agent: PUBoxAgent
 supercategories:
 - sky
-size: 640
+
+# The MS COCO Stuff Dataset
+size: 0.1
+
+# Please take a look at https://github.com/abhay-venkatesh/cocostuff for setup
 source: D:\code\data\cocostuff\dataset
 destination: D:\code\data\filtered_datasets

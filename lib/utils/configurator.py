@@ -12,7 +12,7 @@ class Configurator:
 
     def _set_defaults(self, config):
         if "size" not in config.keys():
-            config["size"] = 640
+            config["size"] = 0.1
         return config
 
     def _load(self, config_file):
