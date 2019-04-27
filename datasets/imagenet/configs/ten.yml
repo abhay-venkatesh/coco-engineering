@@ -1,5 +1,0 @@
-name: ten
-num classes: 10
-splits:
-- name: train
-- name: val
