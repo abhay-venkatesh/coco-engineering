@@ -5,10 +5,9 @@ import os
 
 
 class COCOStuffBuilder:
-    def __init__(self, config):
-        pass
-
     def build(self, split, config):
+        raise NotImplementedError
+
         if split not in ["train", "val"]:
             raise ValueError("Split " + split + " not supported.")
 
@@ -35,7 +34,5 @@ class COCOStuffBuilder:
         for img_id in tqdm(img_ids):
             pass
 
-        raise NotImplementedError
-
     def _build_image(self, img_id, image_path):
-        pass
+        raise NotImplementedError
