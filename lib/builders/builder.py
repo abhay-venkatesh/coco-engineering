@@ -4,7 +4,7 @@ from tqdm import tqdm
 import os
 
 
-class COCOStuffBuilder:
+class Builder:
     def __init__(self, config):
         annotations_path = Path(config["source"], "annotations",
                                 "stuff_" + self.SPLIT + "2017.json")
@@ -37,9 +37,9 @@ class COCOStuffBuilder:
         raise NotImplementedError
 
 
-class COCOStuffValBuilder(COCOStuffBuilder):
+class ValBuilder(Builder):
     SPLIT = "val"
 
 
-class COCOStuffTrainBuilder(COCOStuffBuilder):
+class TrainBuilder(Builder):
     SPLIT = "train"
