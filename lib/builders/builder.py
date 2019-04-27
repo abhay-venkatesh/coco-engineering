@@ -2,6 +2,7 @@ from PIL import Image
 from pathlib import Path
 from pycocotools.coco import COCO
 from tqdm import tqdm
+from lib.datasets.coco_stuff import COCOStuff
 import os
 import shutil
 
@@ -40,6 +41,11 @@ class Builder:
 
             # Save target
             self._build_target(cat_ids, img_id, target_dest_path)
+
+        return self._get_dataset()
+
+    def _get_dataset(self):
+        return COCOStuff(Path(self.config["destination"], self.SPLIT))
 
     def _build_target(self, cat_ids, img_id, target_dest_path):
         ann_ids = self.coco.getAnnIds(imgIds=img_id)

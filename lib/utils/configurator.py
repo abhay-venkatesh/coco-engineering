@@ -27,10 +27,10 @@ class Configurator:
     def _build_paths(self, config):
         config["destination"] = Path(config["destination root"],
                                      config["name"])
-        if os.path.exists(config["destination"]):
-            pass
-            # TODO: uncomment this once done implementing.
-            # raise RuntimeError("Dataset already exists. ")
-        else:
+        if not os.path.exists(config["destination"]):
             os.mkdir(config["destination"])
+
+        config["examples folder"] = Path("examples", config["name"])
+        if not os.path.exists(config["examples folder"]):
+            os.mkdir(config["examples folder"])
         return config

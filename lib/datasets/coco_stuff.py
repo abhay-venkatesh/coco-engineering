@@ -13,7 +13,7 @@ class COCOStuff(data.Dataset):
 
     def __init__(self, root):
         self.root = root
-        image_folder = Path(self.root)
+        image_folder = Path(self.root, "images")
         self.img_names = [
             f for f in os.listdir(image_folder)
             if os.path.isfile(Path(image_folder, f))

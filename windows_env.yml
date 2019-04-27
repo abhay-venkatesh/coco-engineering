@@ -1,4 +1,6 @@
 name: coco-stuff-tools
+channels:
+- pytorch
 dependencies:
 - python=3.7.3
 - numpy
@@ -8,3 +10,5 @@ dependencies:
 - cython
 - pillow
 - tqdm
+- pytorch
+- torchvision
