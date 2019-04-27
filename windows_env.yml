@@ -6,3 +6,5 @@ dependencies:
 - inflection
 - matplotlib
 - cython
+- pillow
+- tqdm

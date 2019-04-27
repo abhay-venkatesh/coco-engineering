@@ -11,8 +11,8 @@ class Configurator:
         return config
 
     def _set_defaults(self, config):
-        if "size" not in config.keys():
-            config["size"] = 0.1
+        if "size fraction" not in config.keys():
+            config["size fraction"] = 0.1
         return config
 
     def _load(self, config_file):
