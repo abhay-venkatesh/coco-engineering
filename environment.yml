@@ -1,0 +1,7 @@
+name: coco-engineering
+channels:
+- defaults
+- hcc
+dependencies:
+- numpy
+- pycocotools
