@@ -7,4 +7,4 @@ size: 0.1
 
 # Please take a look at https://github.com/abhay-venkatesh/cocostuff for setup
 source: D:\code\data\cocostuff\dataset
-destination: D:\code\data\filtered_datasets
+destination root: D:\code\data\filtered_datasets

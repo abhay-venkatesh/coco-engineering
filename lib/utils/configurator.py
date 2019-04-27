@@ -18,16 +18,19 @@ class Configurator:
     def _load(self, config_file):
         with open(config_file, 'r') as stream:
             try:
-                config = yaml.load(stream)
+                config = yaml.load(stream, Loader=yaml.SafeLoader)
                 config["name"] = Path(config_file).stem
                 return config
             except yaml.YAMLError as exc:
                 print(exc)
 
     def _build_paths(self, config):
-        config["dataset path"] = Path(config["destination"], config["name"])
-        if os.path.exists(config["dataset path"]):
-            raise RuntimeError("Dataset already exists. ")
+        config["destination"] = Path(config["destination root"],
+                                     config["name"])
+        if os.path.exists(config["destination"]):
+            pass
+            # TODO: uncomment this once done implementing.
+            # raise RuntimeError("Dataset already exists. ")
         else:
-            os.mkdir(config["dataset path"])
+            os.mkdir(config["destination"])
         return config

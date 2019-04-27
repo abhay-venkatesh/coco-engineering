@@ -4,3 +4,4 @@ dependencies:
 - numpy
 - pyyaml
 - inflection
+- matplotlib
