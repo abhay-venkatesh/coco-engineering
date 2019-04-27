@@ -1,6 +1,6 @@
 agent: BinaryPUAgent
 supercategories:
 - sky
-count: 640
+size: 640
 source: D:\code\data\cocostuff\dataset
 destination: D:\code\data\filtered_datasets
