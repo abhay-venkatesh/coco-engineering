@@ -1,0 +1,2 @@
+class BoxBuilder:
+    pass
