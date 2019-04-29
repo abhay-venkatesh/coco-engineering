@@ -1,11 +1,9 @@
-from lib.builders.builder import TrainBuilder, ValBuilder
 from lib.analyzers.analyzer import Analyzer
+from lib.datasets.coco_stuff import COCOStuff
+from pathlib import Path
 
 
 class Agent:
     def run(self, config):
-        dataset = TrainBuilder(config).build()
-        Analyzer.compute_label_fraction_histogram(config, dataset)
-
-        # dataset = ValBuilder(config).build()
-        # Analyzer.verify(config, dataset)
+        dataset = COCOStuff(Path(config["destination"], "train"))
+        Analyzer(config).compute_label_fraction_histogram(dataset)

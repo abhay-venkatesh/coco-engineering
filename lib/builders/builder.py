@@ -21,10 +21,9 @@ class Builder:
         length = round(len(img_ids) * self.config["size fraction"])
         img_ids = img_ids[:length]
 
-        # Setup paths
+        # Build paths
         img_src_path = Path(self.config["source"], "images",
                             self.SPLIT + "2017")
-
         split_path = Path(self.config["destination"], self.SPLIT)
         image_dest_path = Path(split_path, "images")
         target_dest_path = Path(split_path, "targets")
