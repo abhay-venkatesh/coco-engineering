@@ -6,6 +6,8 @@ import numpy as np
 
 class PUBuilder(Builder):
     def _build_target(self, cat_ids, img_id, target_dest_path):
+        raise NotImplementedError
+
         ann_ids = self.coco.getAnnIds(imgIds=img_id)
         anns = self.coco.loadAnns(ann_ids)
 
@@ -16,7 +18,6 @@ class PUBuilder(Builder):
             if ann["category_id"] in cat_ids:
                 mask = self.coco.annToMask(ann)
 
-                raise NotImplementedError
                 bbox = self._draw_random_bbox_from_seg(img_id, mask)
                 for i in range(1, self.box_type["num miniboxes"]):
                     bbox_ = bbox | self._draw_random_bbox_from_seg(
