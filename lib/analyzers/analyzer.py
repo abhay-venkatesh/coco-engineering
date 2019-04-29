@@ -74,3 +74,4 @@ class Analyzer:
         histogram_image_file = Path(histogram_folder,
                                     "label_frac_histogram.png")
         plt.savefig(histogram_image_file)
+        plt.close()
