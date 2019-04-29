@@ -4,15 +4,14 @@ Engineering the MS COCO Stuff dataset.
 
 ## Setup
 
-### Ubuntu (Coming Soon)
+### Ubuntu
 
 ```bash
 conda env create -f ubuntu_env.yml
+pip install pycocotools
 ```
 
 ### Windows
-
-pycocotools is not available on conda for windows. Hence, do
 
 ```bash
 conda env create -f windows_env.yml

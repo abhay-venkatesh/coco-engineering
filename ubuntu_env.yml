@@ -1,7 +1,6 @@
 name: coco-stuff-tools
 channels:
 - pytorch
-- hcc
 dependencies:
 - python=3.7.3
 - numpy
@@ -14,4 +13,3 @@ dependencies:
 - pytorch
 - torchvision
 - scipy
-- pycocotools
