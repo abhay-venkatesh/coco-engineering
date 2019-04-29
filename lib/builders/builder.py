@@ -1,13 +1,15 @@
 from PIL import Image
+from lib.datasets.coco_stuff import COCOStuff
 from pathlib import Path
 from pycocotools.coco import COCO
 from tqdm import tqdm
-from lib.datasets.coco_stuff import COCOStuff
 import os
-import shutil
 
 
 class Builder:
+    IMG_HEIGHT = 426
+    IMG_WIDTH = 640
+
     def __init__(self, config):
         self.config = config
         annotations_path = Path(self.config["source"], "annotations",
@@ -36,7 +38,9 @@ class Builder:
         for img_id in tqdm(img_ids):
             # Save image
             img_name = self.coco.loadImgs(img_id)[0]['file_name']
-            shutil.copy2(Path(img_src_path, img_name), image_dest_path)
+            img = Image.open(Path(img_src_path, img_name))
+            img = img.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
+            img.save(Path(image_dest_path, img_name))
 
             # Save target
             self._build_target(cat_ids, img_id, target_dest_path)
@@ -63,7 +67,9 @@ class Builder:
                 else:
                     target += mask
 
-        Image.fromarray(target).save(Path(target_dest_path, target_name))
+        target = Image.fromarray(target)
+        target = target.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
+        target.save(Path(target_dest_path, target_name))
 
 
 class ValBuilder(Builder):

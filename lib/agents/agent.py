@@ -1,9 +1,15 @@
 from lib.analyzers.analyzer import Analyzer
-from lib.datasets.coco_stuff import COCOStuff
-from pathlib import Path
+from lib.builders.builder import TrainBuilder, ValBuilder
 
 
 class Agent:
     def run(self, config):
-        dataset = COCOStuff(Path(config["destination"], "train"))
-        Analyzer(config).compute_label_fraction_histogram(dataset)
+        dataset = TrainBuilder(config).build()
+        analyzer = Analyzer(config)
+        analyzer.verify(dataset)
+        analyzer.compute_label_fraction_histogram(dataset)
+
+        dataset = ValBuilder(config).build()
+        analyzer = Analyzer(config)
+        analyzer.verify(dataset)
+        analyzer.compute_label_fraction_histogram(dataset)
