@@ -1,0 +1,10 @@
+agent: Agent
+supercategories:
+- sky
+
+# The MS COCO Stuff Dataset
+size fraction: 1
+
+# Please take a look at https://github.com/abhay-venkatesh/cocostuff for setup
+source: /mnt/hdd-4tb/abhay/cocostuff/dataset
+destination root: /mnt/hdd-4tb/testuser2/datasets
