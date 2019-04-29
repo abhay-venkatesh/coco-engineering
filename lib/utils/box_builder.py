@@ -1,2 +1,3 @@
 class BoxBuilder:
-    pass
+    def draw_pu_box(self, mask):
+        raise NotImplementedError
