@@ -25,10 +25,11 @@ class Configurator:
                 print(exc)
 
     def _build_paths(self, config):
-        config["destination"] = Path(config["destination root"],
-                                     config["name"])
-        if not os.path.exists(config["destination"]):
-            os.mkdir(config["destination"])
+        if "destination" in config.keys():
+            config["destination"] = Path(config["destination root"],
+                                         config["name"])
+            if not os.path.exists(config["destination"]):
+                os.mkdir(config["destination"])
 
         config["stats folder"] = Path("stats", config["name"])
         if not os.path.exists(config["stats folder"]):

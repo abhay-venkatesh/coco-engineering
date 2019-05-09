@@ -1,0 +1,4 @@
+agent: StuffAgent
+
+# Please take a look at https://github.com/abhay-venkatesh/cocostuff for setup
+source: D:\code\data\cocostuff\dataset
