@@ -12,4 +12,3 @@ class PUAgent:
         dataset = PUValBuilder(config).build()
         analyzer = Analyzer(config)
         analyzer.verify(dataset)
-        analyzer.compute_label_fraction_histogram(dataset)

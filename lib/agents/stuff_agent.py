@@ -7,6 +7,7 @@ class StuffAgent:
         dataset = TrainStuffBuilder(config).build()
         analyzer = Analyzer(config)
         analyzer.verify(dataset)
+        analyzer.compute_label_fraction_histograms(dataset)
 
         dataset = ValStuffBuilder(config).build()
         analyzer = Analyzer(config)

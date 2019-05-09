@@ -1,4 +1,5 @@
 from PIL import Image
+from collections import defaultdict
 from pathlib import Path
 from scipy.stats import norm
 from tqdm import tqdm
@@ -53,6 +54,9 @@ class Analyzer:
             with open(cache_file, 'wb') as fp:
                 pickle.dump(xs, fp)
 
+        self._write_histogram(xs, histogram_folder, 0)
+
+    def _write_histogram(self, xs, histogram_folder, i):
         # best fit of data
         (mu, sigma) = norm.fit(xs)
 
@@ -72,6 +76,35 @@ class Analyzer:
         ) % (mu, sigma))
 
         histogram_image_file = Path(histogram_folder,
-                                    "label_frac_histogram.png")
+                                    "label_frac_histogram_" + str(i) + ".png")
         plt.savefig(histogram_image_file)
         plt.close()
+
+    def compute_label_fraction_histograms(self, dataset):
+        if len(dataset) == 0:
+            raise ValueError("Dataset is empty.")
+
+        split = Path(dataset.root).stem
+        histogram_folder = Path(self.config["stats folder"], split,
+                                "histogram")
+        if not os.path.exists(histogram_folder):
+            os.makedirs(histogram_folder)
+
+        Xs = defaultdict(list)
+        cache_file = Path(histogram_folder, "label_frac_histogram.cache")
+        if os.path.exists(cache_file):
+            with open(cache_file, 'rb') as fp:
+                Xs = pickle.load(fp)
+        else:
+
+            for _, target in tqdm(dataset):
+                target = target.numpy()
+                for i in np.unique(target):
+                    Xs[i].append((target == i).sum() /
+                                 (target.shape[0] * target.shape[1]))
+
+            with open(cache_file, 'wb') as fp:
+                pickle.dump(Xs, fp)
+
+        for i in Xs.keys():
+            self._write_histogram(Xs[i], histogram_folder, i)
