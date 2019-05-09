@@ -25,7 +25,7 @@ class Configurator:
                 print(exc)
 
     def _build_paths(self, config):
-        if "destination" in config.keys():
+        if "destination root" in config.keys():
             config["destination"] = Path(config["destination root"],
                                          config["name"])
             if not os.path.exists(config["destination"]):
