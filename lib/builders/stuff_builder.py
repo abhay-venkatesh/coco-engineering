@@ -14,6 +14,12 @@ class StuffBuilder(Builder):
         length = round(len(img_ids) * self.config["size fraction"])
         img_ids = img_ids[:length]
 
+        # Build map for class ids
+        cat_ids = self.coco.getCatIds(supNms=[])
+        cat_id_tuples = list(enumerate(cat_ids))
+        cat_id_map = dict((y, x) for x, y in cat_id_tuples)
+        cat_id_map[183] = 0
+
         # Build paths
         img_src_path = Path(self.config["source"], "images",
                             self.SPLIT + "2017")
@@ -34,11 +40,11 @@ class StuffBuilder(Builder):
             img.save(Path(image_dest_path, img_name))
 
             # Save target
-            self._build_target(cat_ids, img_id, target_dest_path)
+            self._build_target(cat_id_map, img_id, target_dest_path)
 
         return self._get_dataset()
 
-    def _build_target(self, cat_ids, img_id, target_dest_path):
+    def _build_target(self, cat_id_map, img_id, target_dest_path):
         ann_ids = self.coco.getAnnIds(imgIds=img_id)
         anns = self.coco.loadAnns(ann_ids)
 
@@ -46,18 +52,14 @@ class StuffBuilder(Builder):
             ".jpg", ".png")
         target_exists = False
         for ann in anns:
-            if ann["category_id"] in cat_ids:
-                category_id = ann["category_id"]
-                if category_id == 183:
-                    category_id = 0
-
+            if ann["category_id"] in cat_id_map.keys():
                 mask = self.coco.annToMask(ann)
 
                 if not target_exists:
                     target = np.zeros_like(mask)
                     target_exists = True
 
-                target[mask == 1] = category_id
+                target[mask == 1] = cat_id_map[ann["category_id"]]
 
         if not target_exists:
             target = np.zeros((self.IMG_WIDTH, self.IMG_HEIGHT))

@@ -100,8 +100,12 @@ class Analyzer:
             for _, target in tqdm(dataset):
                 target = target.numpy()
                 for i in np.unique(target):
-                    Xs[i].append((target == i).sum() /
-                                 (target.shape[0] * target.shape[1]))
+                    ratio = ((target == i).sum() /
+                             (target.shape[0] * target.shape[1]))
+
+                    # Only add to histogram if the target class is present
+                    if ratio > 0:
+                        Xs[i].append(ratio)
 
             with open(cache_file, 'wb') as fp:
                 pickle.dump(Xs, fp)
