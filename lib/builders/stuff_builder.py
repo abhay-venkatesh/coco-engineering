@@ -61,8 +61,9 @@ class StuffBuilder(Builder):
 
         if not target_exists:
             target = np.zeros((self.IMG_WIDTH, self.IMG_HEIGHT))
-            
+
         target = Image.fromarray(target)
+        target = target.convert("L")
         target = target.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
         target.save(Path(target_dest_path, target_name))
 
