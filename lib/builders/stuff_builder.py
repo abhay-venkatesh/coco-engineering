@@ -59,6 +59,9 @@ class StuffBuilder(Builder):
 
                 target[mask == 1] = category_id
 
+        if not target_exists:
+            target = np.zeros((self.IMG_WIDTH, self.IMG_HEIGHT))
+            
         target = Image.fromarray(target)
         target = target.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
         target.save(Path(target_dest_path, target_name))
