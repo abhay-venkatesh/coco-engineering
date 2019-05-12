@@ -97,15 +97,12 @@ class Analyzer:
                 Xs = pickle.load(fp)
         else:
 
+            print("Building label histograms...")
             for _, target in tqdm(dataset):
                 target = target.numpy()
                 for i in np.unique(target):
-                    ratio = ((target == i).sum() /
-                             (target.shape[0] * target.shape[1]))
-
-                    # Only add to histogram if the target class is present
-                    if ratio > 0:
-                        Xs[i].append(ratio)
+                    Xs[i].append((target == i).sum() /
+                                 (target.shape[0] * target.shape[1]))
 
             with open(cache_file, 'wb') as fp:
                 pickle.dump(Xs, fp)
