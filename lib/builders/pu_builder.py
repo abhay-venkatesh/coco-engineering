@@ -27,7 +27,7 @@ class PUBuilder(Builder):
         target_name = self.coco.loadImgs(img_id)[0]['file_name'].replace(
             ".jpg", ".png")
         target = Image.fromarray(target)
-        target = target.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
+        target = target.resize((self.img_width, self.img_height))
         target.save(Path(target_dest_path, target_name))
 
 

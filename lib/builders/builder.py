@@ -16,6 +16,13 @@ class Builder:
                                 "stuff_" + self.SPLIT + "2017.json")
         self.coco = COCO(annotations_path)
 
+        self.img_height = self.IMG_HEIGHT
+        self.img_width = self.IMG_WIDTH
+        if "height" in self.config.keys():
+            self.img_height = self.config["height"]
+        if "width" in self.config.keys():
+            self.img_width = self.config["width"]
+
     def build(self):
         # Load image ids
         cat_ids = self.coco.getCatIds(supNms=self.config["supercategories"])
@@ -39,7 +46,7 @@ class Builder:
             # Save image
             img_name = self.coco.loadImgs(img_id)[0]['file_name']
             img = Image.open(Path(img_src_path, img_name))
-            img = img.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
+            img = img.resize((self.img_width, self.img_height))
             img.save(Path(image_dest_path, img_name))
 
             # Save target
@@ -68,7 +75,7 @@ class Builder:
                     target += mask
 
         target = Image.fromarray(target)
-        target = target.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
+        target = target.resize((self.img_width, self.img_height))
         target.save(Path(target_dest_path, target_name))
 
 

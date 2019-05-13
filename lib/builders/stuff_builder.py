@@ -36,7 +36,7 @@ class StuffBuilder(Builder):
             # Save image
             img_name = self.coco.loadImgs(img_id)[0]['file_name']
             img = Image.open(Path(img_src_path, img_name))
-            img = img.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
+            img = img.resize((self.img_width, self.img_height))
             img.save(Path(image_dest_path, img_name))
 
             # Save target
@@ -62,11 +62,11 @@ class StuffBuilder(Builder):
                 target[mask == 1] = cat_id_map[ann["category_id"]]
 
         if not target_exists:
-            target = np.zeros((self.IMG_WIDTH, self.IMG_HEIGHT))
+            target = np.zeros((self.img_width, self.img_height))
 
         target = Image.fromarray(target)
         target = target.convert("L")
-        target = target.resize((self.IMG_WIDTH, self.IMG_HEIGHT))
+        target = target.resize((self.img_width, self.img_height))
         target.save(Path(target_dest_path, target_name))
 
 
