@@ -6,5 +6,5 @@ supercategories:
 size fraction: 1
 
 # Please take a look at https://github.com/abhay-venkatesh/cocostuff for setup
-source: D:\code\data\cocostuff\dataset
-destination root: D:\code\data\filtered_datasets
+source: /home/abhay/data/cocostuff/dataset
+destination root: /home/abhay/data/filtered_datasets/s
