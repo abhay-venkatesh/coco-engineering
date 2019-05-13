@@ -1,0 +1,12 @@
+agent: StuffAgent
+supercategories: []
+
+# The MS COCO Stuff Dataset
+size fraction: 1
+
+# Please take a look at https://github.com/abhay-venkatesh/cocostuff for setup
+source: /home/abhay/data/cocostuff/dataset/
+destination root: /home/abhay/data/filtered_datasets/
+
+height: 106
+width: 160
