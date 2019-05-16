@@ -1,5 +1,6 @@
 from lib.analyzers.analyzer import Analyzer
-from lib.builders.builder import TrainSingleStuffBuilder, ValSingleStuffBuilder
+from lib.builders.single_stuff_builder import TrainSingleStuffBuilder, \
+    ValSingleStuffBuilder
 
 
 class SingleStuffAgent:
