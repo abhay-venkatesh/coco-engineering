@@ -43,11 +43,11 @@ class FullStuffBuilder(Builder):
             # Save image
             img_name = self.coco.loadImgs(img_id)[0]['file_name']
             img = Image.open(Path(img_src_path, img_name))
-            h, w, _ = np.array(img).shape
+            h, w = np.array(img).shape[0], np.array(img).shape[1]
             img.save(Path(image_dest_path, img_name))
 
             # Save target
-            self._build_target(img, cat_id_map, img_id, target_dest_path)
+            self._build_target(h, w, cat_id_map, img_id, target_dest_path)
 
         return self._get_dataset()
 
