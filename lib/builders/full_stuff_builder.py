@@ -43,6 +43,7 @@ class FullStuffBuilder(Builder):
             # Save image
             img_name = self.coco.loadImgs(img_id)[0]['file_name']
             img = Image.open(Path(img_src_path, img_name))
+            h, w, _ = np.array(img).shape
             img.save(Path(image_dest_path, img_name))
 
             # Save target
@@ -50,7 +51,7 @@ class FullStuffBuilder(Builder):
 
         return self._get_dataset()
 
-    def _build_target(self, img, cat_id_map, img_id, target_dest_path):
+    def _build_target(self, h, w, cat_id_map, img_id, target_dest_path):
         ann_ids = self.coco.getAnnIds(imgIds=img_id)
         anns = self.coco.loadAnns(ann_ids)
 
@@ -67,10 +68,8 @@ class FullStuffBuilder(Builder):
 
                 target[mask == 1] = cat_id_map[ann["category_id"]]
 
-        print(img.shape)
-        raise RuntimeError
         if not target_exists:
-            target = np.zeros((img.shape[1], img.shape[2]))
+            target = np.zeros((w, h))
 
         target = Image.fromarray(target)
         target = target.convert("L")
