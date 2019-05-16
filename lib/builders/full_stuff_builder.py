@@ -46,7 +46,7 @@ class FullStuffBuilder(Builder):
             img.save(Path(image_dest_path, img_name))
 
             # Save target
-            self._build_target(cat_id_map, img_id, target_dest_path)
+            self._build_target(img, cat_id_map, img_id, target_dest_path)
 
         return self._get_dataset()
 
