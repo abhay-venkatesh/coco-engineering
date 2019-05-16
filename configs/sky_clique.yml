@@ -1,4 +1,4 @@
-agent: Agent
+agent: SingleStuffAgent
 supercategories:
 - sky
 
