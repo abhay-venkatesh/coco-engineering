@@ -33,5 +33,5 @@ class Configurator:
 
         config["stats folder"] = Path("stats", config["name"])
         if not os.path.exists(config["stats folder"]):
-            os.mkdir(config["stats folder"])
+            os.makedirs(config["stats folder"])
         return config
