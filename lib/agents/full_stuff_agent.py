@@ -8,7 +8,6 @@ class FullStuffAgent:
         dataset = TrainFullStuffBuilder(config).build()
         analyzer = Analyzer(config)
         analyzer.verify(dataset)
-        analyzer.compute_label_fraction_histogram(dataset)
 
         dataset = ValFullStuffBuilder(config).build()
         analyzer = Analyzer(config)

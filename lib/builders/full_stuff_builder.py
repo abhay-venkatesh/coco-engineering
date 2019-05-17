@@ -69,7 +69,7 @@ class FullStuffBuilder(Builder):
                 target[mask == 1] = cat_id_map[ann["category_id"]]
 
         if not target_exists:
-            target = np.zeros((w, h))
+            target = np.zeros((h, w))
 
         target = Image.fromarray(target)
         target = target.convert("L")
