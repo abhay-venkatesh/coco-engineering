@@ -15,7 +15,6 @@ def set_styles():
 
 
 def write_histogram(xs):
-    set_styles()
     plotobj = sns.kdeplot(xs, shade=True)
     plotobj.axis("off")
     # sns.despine()
@@ -24,11 +23,36 @@ def write_histogram(xs):
     fig.savefig("hist.png")
 
 
-if __name__ == "__main__":
+def sky_histogram():
     xs = []
-    cache_file = "label_frac_histogram.cache"
+    cache_file = "sky_histogram.cache"
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as fp:
             xs = pickle.load(fp)
 
     write_histogram(xs)
+
+
+def all_histogram():
+    with open("histogram.cache", 'rb') as fp:
+        Xs = pickle.load(fp)
+    xs = []
+    for i in Xs.keys():
+        xs.extend(Xs[i])
+    plotobj = sns.kdeplot(xs)
+    
+    sky = []
+    for i in [14, 92]:
+        sky.extend(Xs[i])
+
+    plotobj = sns.kdeplot(sky, shade=True)
+
+    sns.despine()
+    fig = plotobj.get_figure()
+    fig.tight_layout()
+    fig.savefig("hist.png")
+
+
+if __name__ == "__main__":
+    set_styles()
+    all_histogram()
