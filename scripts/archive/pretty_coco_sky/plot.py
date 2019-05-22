@@ -1,33 +1,27 @@
-from pathlib import Path
-from scipy.stats import norm
-import matplotlib.pyplot as plt
 import os
 import pickle
+import seaborn as sns
+
+PALETTE = sns.diverging_palette(220, 10, n=7)
+FONT_SCALE = 1.5
+STYLE = "ticks"
+CONTEXT = "paper"
+
+
+def set_styles():
+    sns.set_context(CONTEXT)
+    sns.set(style=STYLE, font_scale=FONT_SCALE)
+    sns.set_palette(PALETTE)
 
 
 def write_histogram(xs):
-    # best fit of data
-    (mu, sigma) = norm.fit(xs)
-
-    # the histogram of the data
-    n, bins, patches = plt.hist(
-        xs, 50, density=1, facecolor='black', alpha=0.75)
-
-    # add a 'best fit' line
-    y = norm.pdf(bins, mu, sigma)
-    plt.plot(bins, y, 'r--', linewidth=2, color="#b2fef7")
-
-    # Color
-    for bin_, patch in zip(bins, patches):
-        if bin_ >= 0.6:
-            patch.set_facecolor("#4f9a94")
-        else:
-            patch.set_facecolor("black")
-
-    histogram_image_file = Path("label_frac_histogram.png")
-    plt.axis("off")
-    plt.savefig(histogram_image_file)
-    plt.close()
+    set_styles()
+    plotobj = sns.kdeplot(xs, shade=True)
+    plotobj.axis("off")
+    # sns.despine()
+    fig = plotobj.get_figure()
+    fig.tight_layout()
+    fig.savefig("hist.png")
 
 
 if __name__ == "__main__":
