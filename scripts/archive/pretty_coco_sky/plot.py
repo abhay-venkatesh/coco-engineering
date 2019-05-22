@@ -1,44 +1,33 @@
 import matplotlib.patches as mpatches
-import os
 import pickle
 import seaborn as sns
 
 PALETTE = sns.diverging_palette(220, 10, n=7)
-FONT_SCALE = 2
+FONT_SCALE = 1.2
 STYLE = "ticks"
 CONTEXT = "poster"
 
 
 def set_styles():
-    sns.set_context(CONTEXT)
-    sns.set(style=STYLE, font_scale=FONT_SCALE)
+    sns.set(
+        style=STYLE,
+        context=CONTEXT,
+        font_scale=FONT_SCALE,
+        rc={
+            "lines.linewidth": 5,
+            'xtick.major.width': 5,
+            'ytick.major.width': 5,
+            'axes.linewidth': 5,
+            'axes.labelweight': 2,
+        })
     sns.set_palette(PALETTE)
 
 
-def write_histogram(xs):
-    plotobj = sns.kdeplot(xs, shade=True)
-    plotobj.axis("off")
-    # sns.despine()
-    fig = plotobj.get_figure()
-    fig.tight_layout()
-    fig.savefig("hist.png")
-
-
-def sky_histogram():
-    xs = []
-    cache_file = "sky_histogram.cache"
-    if os.path.exists(cache_file):
-        with open(cache_file, 'rb') as fp:
-            xs = pickle.load(fp)
-
-    write_histogram(xs)
-
-
 def all_histogram():
+    set_styles()
     with open("histogram.cache", 'rb') as fp:
         Xs = pickle.load(fp)
 
-    sns.set_context("poster")
     # Plot entire dataset
     xs = []
     for i in Xs.keys():
@@ -47,7 +36,7 @@ def all_histogram():
 
     # Plot Sky
     sky = []
-    for i in [14, 92]:
+    for i in [14, 94]:
         sky.extend(Xs[i])
     plotobj = sns.kdeplot(sky, shade=True)
 
@@ -59,12 +48,22 @@ def all_histogram():
     label_patches.append(label_patch)
     plotobj.legend(handles=label_patches)
 
+    # Aesthetics
     sns.despine()
     fig = plotobj.get_figure()
     fig.tight_layout()
+
     fig.savefig("hist.png")
 
 
-if __name__ == "__main__":
+def plot_all_histograms():
     set_styles()
+    with open("histogram.cache", 'rb') as fp:
+        Xs = pickle.load(fp)
+
+    for i in Xs.keys():
+        pass
+
+
+if __name__ == "__main__":
     all_histogram()
