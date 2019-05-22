@@ -6,7 +6,7 @@ import seaborn as sns
 PALETTE = sns.diverging_palette(220, 10, n=7)
 FONT_SCALE = 2
 STYLE = "ticks"
-CONTEXT = "paper"
+CONTEXT = "poster"
 
 
 def set_styles():
@@ -38,6 +38,7 @@ def all_histogram():
     with open("histogram.cache", 'rb') as fp:
         Xs = pickle.load(fp)
 
+    sns.set_context("poster")
     # Plot entire dataset
     xs = []
     for i in Xs.keys():
@@ -54,8 +55,7 @@ def all_histogram():
     label_patches = []
     label_patch = mpatches.Patch(color=PALETTE[0], label="Full Dataset")
     label_patches.append(label_patch)
-    label_patch = mpatches.Patch(
-        color=PALETTE[1], label='"Sky" Supercategory')
+    label_patch = mpatches.Patch(color=PALETTE[1], label='"Sky" Class')
     label_patches.append(label_patch)
     plotobj.legend(handles=label_patches)
 
