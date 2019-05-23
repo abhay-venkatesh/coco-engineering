@@ -66,4 +66,4 @@ def plot_all_histograms():
 
 
 if __name__ == "__main__":
-    all_histogram()
+    plot_all_histograms()
