@@ -2,7 +2,7 @@ import matplotlib.patches as mpatches
 import pickle
 import seaborn as sns
 
-PALETTE = sns.diverging_palette(220, 10, n=7)
+PALETTE = sns.diverging_palette(10, 220, n=7)
 FONT_SCALE = 1.2
 STYLE = "ticks"
 CONTEXT = "poster"
