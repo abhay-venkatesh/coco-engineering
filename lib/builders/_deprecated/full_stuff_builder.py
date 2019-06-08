@@ -82,3 +82,47 @@ class ValFullStuffBuilder(FullStuffBuilder):
 
 class TrainFullStuffBuilder(FullStuffBuilder):
     SPLIT = "train"
+
+class COCOStuff2018Builder(FullStuffBuilder):
+    def build(self):
+        # Load image ids
+        cat_ids = self.coco.getCatIds(supNms=self.config["supercategories"])
+        img_ids = self.coco.getImgIds(catIds=[])
+        length = round(len(img_ids) * self.config["size fraction"])
+        img_ids = img_ids[:length]
+
+        # Build map for class ids
+        cat_ids = self.coco.getCatIds(supNms=[])
+        cat_id_tuples = list(enumerate(cat_ids))
+        cat_id_map = dict((y, x) for x, y in cat_id_tuples)
+        cat_id_map[183] = 0
+
+        # Build paths
+        img_src_path = Path(self.config["source"], "images",
+                            self.SPLIT + "2017")
+        split_path = Path(self.config["destination"], self.SPLIT)
+        image_dest_path = Path(split_path, "images")
+        target_dest_path = Path(split_path, "targets")
+        for path in [split_path, image_dest_path, target_dest_path]:
+            if not os.path.exists(path):
+                os.mkdir(path)
+
+        # Build the dataset
+        print("Building " + self.SPLIT + " split...")
+        for img_id in tqdm(img_ids):
+            # Save image
+            img_name = self.coco.loadImgs(img_id)[0]['file_name']
+            img = Image.open(Path(img_src_path, img_name))
+            h, w = np.array(img).shape[0], np.array(img).shape[1]
+            img.save(Path(image_dest_path, img_name))
+
+            # Save target
+            self._build_target(h, w, cat_id_map, img_id, target_dest_path)
+
+        return self._get_dataset()
+
+class ValCOCOStuff2018Builder(COCOStuff2018Builder):
+    SPLIT = "val"
+
+class TrainCOCOStuff2018Builder(COCOStuff2018Builder):
+    SPLIT = "train"

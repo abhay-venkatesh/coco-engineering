@@ -1,0 +1,3 @@
+agent: Stuff2018Agent
+source: /home/ubuntu/data/cocostuff/dataset
+destination root: /home/ubuntu/data/filtered_datasets/

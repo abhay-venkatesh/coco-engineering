@@ -12,7 +12,9 @@ class Configurator:
 
     def _set_defaults(self, config):
         if "size fraction" not in config.keys():
-            config["size fraction"] = 0.1
+            config["size fraction"] = 1
+        if "supercategories" not in config.keys():
+            config["supercategories"] = []
         return config
 
     def _load(self, config_file):
