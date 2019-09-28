@@ -17,3 +17,9 @@ pip install pycocotools
 conda env create -f windows_env.yml
 pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"
 ```
+
+## Running
+
+```bash
+python main.py /path/to/config.yml
+```
