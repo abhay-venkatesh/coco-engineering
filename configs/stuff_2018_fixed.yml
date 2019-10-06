@@ -1,0 +1,3 @@
+agent: Stuff2018FixedAgent
+source: /home/abhay/code/data/cocostuff/dataset
+destination root: /home/abhay/code/data/filtered_datasets/
