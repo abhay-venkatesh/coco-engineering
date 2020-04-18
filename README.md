@@ -1,7 +1,5 @@
 # coco-stuff-tools
 
-Engineering the MS COCO Stuff dataset.
-
 ## Setup
 
 ### Ubuntu
